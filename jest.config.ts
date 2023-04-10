@@ -44,4 +44,10 @@ export default {
 	// An object that configures minimum threshold enforcement for coverage results
 	// coverageThreshold: undefined,
 
-	// A path
+	// A path to a custom dependency extractor
+	// dependencyExtractor: undefined,
+
+	// Make calling deprecated APIs throw helpful error messages
+	// errorOnDeprecated: false,
+
+	// The default configuration for 
