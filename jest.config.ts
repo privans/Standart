@@ -50,4 +50,12 @@ export default {
 	// Make calling deprecated APIs throw helpful error messages
 	// errorOnDeprecated: false,
 
-	// The default configuration for 
+	// The default configuration for fake timers
+	// fakeTimers: {
+	//   "enableGlobally": false
+	// },
+
+	// Force coverage collection from ignored files using an array of glob patterns
+	// forceCoverageMatch: [],
+
+	// A path to a module which exp
