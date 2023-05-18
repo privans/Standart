@@ -142,4 +142,8 @@ export default {
 	// The number of seconds after which a test is considered as slow and reported as such in the results.
 	// slowTestThreshold: 5,
 
-	// A list of paths to sn
+	// A list of paths to snapshot serializer modules Jest should use for snapshot testing
+	// snapshotSerializers: [],
+
+	// The test environment that will be used for testing
+	// testEnvironment: "jest-environment-node",
