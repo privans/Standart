@@ -104,4 +104,11 @@ export default {
 	// A preset that is used as a base for Jest's configuration
 	// preset: undefined,
 
-	// Run tests from one or
+	// Run tests from one or more projects
+	// projects: undefined,
+
+	// Use this configuration option to add custom reporters to Jest
+	// reporters: undefined,
+
+	// Automatically reset mock state before every test
+	// reset
