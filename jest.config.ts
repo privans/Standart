@@ -147,3 +147,12 @@ export default {
 
 	// The test environment that will be used for testing
 	// testEnvironment: "jest-environment-node",
+
+	// Options that will be passed to the testEnvironment
+	// testEnvironmentOptions: {},
+
+	// Adds a location field to test results
+	// testLocationInResults: false,
+
+	// The glob patterns Jest uses to detect test files
+	// testM
