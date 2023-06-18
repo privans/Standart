@@ -28,4 +28,12 @@
 	"dependencies": {
 		"debeem-cipher": "^1.0.1",
 		"debeem-id": "^1.0.24",
-		
+		"debeem-utils": "^1.0.49",
+		"ethers": "^6.8.1",
+		"fake-indexeddb": "^5.0.1",
+		"idb": "^7.1.1",
+		"lodash": "^4.17.21",
+		"socket.io-client": "^4.7.2",
+		"uuid": "^9.0.1"
+	},
+	"author": "DeBeem, Team.
