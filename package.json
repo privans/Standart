@@ -1,4 +1,13 @@
 {
 	"name": "debeem-chat-client",
 	"version": "1.0.70",
-	"description": "Decentral
+	"description": "Decentralized Chat-Client by DeBeem, Team.",
+	"main": "dist/index.js",
+	"browser": "dist/index.js",
+	"license": "MIT",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"clean": "rm -rf dist",
+		"build": "npm run clean && ts
