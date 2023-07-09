@@ -114,3 +114,217 @@ export class ClientConnect
 			}, 1000 );
 		} );
 		this.socket.on( `disconnect`, ( reason ) =>
+		{
+			console.log( `disconnected from server, socket.id :`, this.socket.id );
+			if ( `io server disconnect` === reason )
+			{
+				//	the disconnection was initiated by the server, you need to reconnect manually
+				this.socket.connect();
+			}
+		} );
+		// this.socket.on( `message`, ( serverId : string, roomId : string, message : any ) =>
+		// {
+		// 	console.log( `message from server: ${ serverId }, roomId: ${ roomId }, `, message );
+		// 	this.socket.emit( `ack`, `200` );
+		// 	if ( _.isFunction( this.receiveMessageCallback ) )
+		// 	{
+		// 		this.receiveMessageCallback( serverId, roomId, message );
+		// 	}
+		// } );
+
+		/**
+		 * 	for room
+		 */
+		this.socket.on( `room-join`, ( response : JoinRoomResponse ) =>
+		{
+			console.log( `Client :: received room-join response:`, response );
+		} );
+		this.socket.on( `room-leave`, ( response : LeaveRoomResponse ) =>
+		{
+			console.log( `Client :: received room-leave response:`, response );
+		} );
+		this.socket.on( `chat-message`, ( sendMessageRequest : SendMessageRequest, callback : ( ack : any ) => void ) =>
+		{
+			console.log( `received chat-message: `, sendMessageRequest );
+			console.log( `received chat-message: callback :`, callback );
+			console.log( `received chat-message: callback is function: `, _.isFunction( callback ) );
+			if ( _.isFunction( callback ) )
+			{
+				console.log( `received chat-message: will call callback` );
+				callback( {
+					status : `ok`
+				} );
+			}
+			else
+			{
+				console.log( `received chat-message: callback is not a function` );
+			}
+			if ( _.isFunction( this.receiveMessageCallback ) )
+			{
+				//	.payload.body is encrypted string
+				this.receiveMessageCallback( sendMessageRequest, ( ack : any ) =>
+				{
+					console.log( `ReceiveMessageCallback ack:`, ack );
+				} );
+			}
+		} );
+	}
+
+	/**
+	 *	@param joinRoomRequest	{JoinRoomRequest}
+	 *	@param [callback]	{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public joinRoom( joinRoomRequest : JoinRoomRequest, callback ? : ResponseCallback ) : void
+	{
+		const errorJoinRoomRequest : string | null = VaJoinRoomRequest.validateJoinRoomRequest( joinRoomRequest );
+		if ( null !== errorJoinRoomRequest )
+		{
+			throw new Error( `${ this.constructor.name }.joinRoom :: ${ errorJoinRoomRequest }` );
+		}
+		this.send( `room-join`, joinRoomRequest, callback );
+	}
+
+	/**
+	 * 	asynchronously join a room
+	 *
+	 *	@param joinRoomRequest	{JoinRoomRequest}
+	 *	@returns {Promise< JoinRoomResponse | null >}
+	 */
+	public joinRoomAsync( joinRoomRequest : JoinRoomRequest ) : Promise< JoinRoomResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorJoinRoomRequest : string | null = VaJoinRoomRequest.validateJoinRoomRequest( joinRoomRequest );
+				if ( null !== errorJoinRoomRequest )
+				{
+					return reject( `${ this.constructor.name }.joinRoomAsync :: ${ errorJoinRoomRequest }` );
+				}
+
+				const response : any = await this.sendAsync( `room-join`, joinRoomRequest );
+				resolve( response ? response as JoinRoomResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param leaveRoomRequest		{LeaveRoomRequest}
+	 *	@param [callback]		{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public leaveRoom( leaveRoomRequest : LeaveRoomRequest, callback ? : ResponseCallback ) : void
+	{
+		const errorLeaveRoomRequest : string | null = VaLeaveRoomRequest.validateLeaveRoomRequest( leaveRoomRequest );
+		if ( null !== errorLeaveRoomRequest )
+		{
+			throw new Error( `${ this.constructor.name }.leaveRoom :: ${ errorLeaveRoomRequest }` );
+		}
+		this.send( `room-leave`, leaveRoomRequest, callback );
+	}
+
+	/**
+	 * 	asynchronously leave a room
+	 *
+	 *	@param leaveRoomRequest		{LeaveRoomRequest}
+	 *	@returns {Promise<any>}
+	 */
+	public leaveRoomAsync( leaveRoomRequest : LeaveRoomRequest ) : Promise< LeaveRoomResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorLeaveRoomRequest : string | null = VaLeaveRoomRequest.validateLeaveRoomRequest( leaveRoomRequest );
+				if ( null !== errorLeaveRoomRequest )
+				{
+					return reject( `${ this.constructor.name }.leaveRoomAsync :: ${ errorLeaveRoomRequest }` );
+				}
+
+				const response : any = await this.sendAsync( `room-leave`, leaveRoomRequest );
+				resolve( response ? response as LeaveRoomResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 * 	@deprecated
+	 *
+	 *	@param existInRoomRequest	{ExistRoomRequest}
+	 *	@param [callback]		{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public existInRoom( existInRoomRequest : ExistRoomRequest, callback ? : ResponseCallback ) : void
+	{
+		return this.existRoom( existInRoomRequest, callback );
+	}
+
+	/**
+	 *	check if a room is existed
+	 *
+	 *	@param existInRoomRequest	{ExistRoomRequest}
+	 *	@param [callback]		{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public existRoom( existInRoomRequest : ExistRoomRequest, callback ? : ResponseCallback ) : void
+	{
+		const errorExistInRoomRequest : string | null = VaExistRoomRequest.validateExistRoomRequest( existInRoomRequest );
+		if ( null !== errorExistInRoomRequest )
+		{
+			throw new Error( `${ this.constructor.name }.existRoom :: ${ errorExistInRoomRequest }` );
+		}
+		this.send( `room-exist`, existInRoomRequest, callback );
+	}
+
+	/**
+	 * 	asynchronously check if a room is existed
+	 *
+	 *	@param existInRoomRequest	{ExistRoomRequest}
+	 *	@returns {Promise< ExistRoomResponse | null >}
+	 */
+	public existRoomAsync( existInRoomRequest : ExistRoomRequest ) : Promise< ExistRoomResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorExistInRoomRequest : string | null = VaExistRoomRequest.validateExistRoomRequest( existInRoomRequest );
+				if ( null !== errorExistInRoomRequest )
+				{
+					return reject( `${ this.constructor.name }.existRoomAsync :: ${ errorExistInRoomRequest }` );
+				}
+
+				const response : any = await this.sendAsync( `room-exist`, existInRoomRequest );
+				resolve( response ? response as ExistRoomResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param sendMessageRequest	{SendMessageRequest}
+	 *	@param [callback]		{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public sendMessage( sendMessageRequest : SendMessageRequest, callback ? : ResponseCallback ) : void
+	{
+		const errorSendMessageRequest : string | null = VaSendMessageRequest.validateSendMessageRequest( sendMessageRequest );
+		if ( null !== errorSendMessageRequest )
+		{
+			throw new Error( `${ this.constructor.name }.sendMessage :: ${ errorSendMessageRequest }` );
+		}
