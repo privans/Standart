@@ -328,3 +328,187 @@ export class ClientConnect
 		{
 			throw new Error( `${ this.constructor.name }.sendMessage :: ${ errorSendMessageRequest }` );
 		}
+
+		//	...
+		this.send( `chat-message`, sendMessageRequest, callback );
+	}
+
+	/**
+	 * 	asynchronously sent chat message
+	 *
+	 *	@param sendMessageRequest	{SendMessageRequest}
+	 *	@returns {Promise< SendMessageResponse | null >}
+	 */
+	public sendMessageAsync( sendMessageRequest : SendMessageRequest ) : Promise< SendMessageResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorSendMessageRequest : string | null = VaSendMessageRequest.validateSendMessageRequest( sendMessageRequest );
+				if ( null !== errorSendMessageRequest )
+				{
+					return reject( `${ this.constructor.name }.sendMessageAsync :: ${ errorSendMessageRequest }` );
+				}
+
+				//	...
+				const response : any = await this.sendAsync( `chat-message`, sendMessageRequest );
+				resolve( response ? response as SendMessageResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param privateKey	{string}
+	 *	@param chatMessage	{ChatMessage}
+	 *	@param [callback]	{ResponseCallback}
+	 */
+	public sendPrivateMessage( privateKey : string, chatMessage : ChatMessage, callback ? : ResponseCallback ) : void
+	{
+		new PrivateMessageBuilder().buildMessage( privateKey, chatMessage ).then( ( sendMessageRequest : SendMessageRequest ) =>
+		{
+			this.sendMessage( sendMessageRequest, callback );
+
+		}).catch( err =>
+		{
+			throw new Error( err );
+		});
+	}
+
+	/**
+	 *	asynchronously send private message
+	 *
+	 * 	@param privateKey	{string}
+	 * 	@param chatMessage	{ChatMessage}
+	 * 	@returns {Promise< SendMessageResponse | null >}
+	 */
+	public sendPrivateMessageAsync( privateKey : string, chatMessage : ChatMessage ) : Promise< SendMessageResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! isHexString( privateKey, 32 ) )
+				{
+					return reject( `${ this.constructor.name }.sendPrivateMessageAsync :: invalid privateKey` );
+				}
+				if ( ! _.isObject( chatMessage ) )
+				{
+					return reject( `${ this.constructor.name }.sendPrivateMessageAsync :: invalid chatMessage` );
+				}
+
+				//	...
+				const sendMessageRequest : SendMessageRequest = await new PrivateMessageBuilder().buildMessage( privateKey, chatMessage );
+				const response : any = await this.sendMessageAsync( sendMessageRequest );
+				resolve( response ? response as SendMessageResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param privateKey	{string}
+	 *	@param chatMessage	{ChatMessage}
+	 *	@param pinCode		{string}
+	 *	@param [callback]	{ResponseCallback}
+	 */
+	public sendGroupMessage( privateKey : string, chatMessage : ChatMessage, pinCode : string, callback ? : ResponseCallback ) : void
+	{
+		new GroupMessageBuilder().buildMessage( privateKey, chatMessage, pinCode ).then( ( sendMessageRequest : SendMessageRequest ) =>
+		{
+			this.sendMessage( sendMessageRequest, callback );
+
+		}).catch( err =>
+		{
+			throw new Error( err );
+		});
+	}
+
+	/**
+	 * 	asynchronously send group message
+	 *
+	 *	@param privateKey	{string}
+	 *	@param chatMessage	{ChatMessage}
+	 *	@param pinCode		{string}
+	 *	@returns {Promise< SendMessageResponse | null >}
+	 */
+	public sendGroupMessageAsync( privateKey : string, chatMessage : ChatMessage, pinCode : string ) : Promise< SendMessageResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const sendMessageRequest : SendMessageRequest = await new GroupMessageBuilder().buildMessage( privateKey, chatMessage, pinCode );
+				const response : any = await this.sendMessageAsync( sendMessageRequest );
+				resolve( response ? response as SendMessageResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param pullMessageRequest	{PullMessageRequest}
+	 *	@param [callback]		{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public pullMessage( pullMessageRequest : PullMessageRequest, callback ? : ResponseCallback ) : void
+	{
+		const errorPullMessageRequest : string | null = VaPullMessageRequest.validatePullMessageRequest( pullMessageRequest );
+		if ( null !== errorPullMessageRequest )
+		{
+			throw new Error( `${ this.constructor.name }.pullMessage :: ${ errorPullMessageRequest }` );
+		}
+
+		//	...
+		this.send( `pull-message`, pullMessageRequest, callback );
+	}
+
+	/**
+	 *	asynchronously pull message
+	 *
+	 *	@param pullMessageRequest	{PullMessageRequest}
+	 *	@returns {Promise< PullMessageResponse | null >}
+	 */
+	public pullMessageAsync( pullMessageRequest : PullMessageRequest ) : Promise< PullMessageResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorPullMessageRequest : string | null = VaPullMessageRequest.validatePullMessageRequest( pullMessageRequest );
+				if ( null !== errorPullMessageRequest )
+				{
+					return reject( `${ this.constructor.name }.pullMessageAsync :: ${ errorPullMessageRequest }` );
+				}
+
+				//	...
+				const response : any = await this.sendAsync( `pull-message`, pullMessageRequest );
+				resolve( response ? response as PullMessageResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param countMessageRequest	{CountMessageRequest}
+	 *	@param callback			{ResponseCallback}
+	 *	@returns {void}
+	 */
+	public countMessage( countMessageRequest : CountMessageRequest, callback ? : ResponseCallback ) : void
