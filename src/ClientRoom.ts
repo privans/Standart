@@ -177,3 +177,206 @@ export class ClientRoom
 						roomList.push( item );
 					}
 				}
+
+				resolve( roomList );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 * 	create an invitation to invite member
+	 *	@param wallet	{string}
+	 *	@param roomId	{string}
+	 *	@returns {InviteRequest | null}
+	 */
+	public inviteMember( wallet : string, roomId : string ) : Promise<InviteRequest | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const key : string = this.getStorageKey( wallet, roomId );
+				const roomItem : ChatRoomEntityItem | null = await this.chatRoomStorageService.get( key );
+				//console.log( `inviteMember roomItem :`, _.cloneDeep( roomItem ) );
+				if ( ! roomItem )
+				{
+					return reject( `${ this.constructor.name } :: room not found` );
+				}
+				if ( ! _.isObject( roomItem.members ) || _.isEmpty( roomItem.members ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid members` );
+				}
+
+				//	build
+				let invite : InviteRequest = _.cloneDeep( clientInviteRequestInitV1 );
+				invite.chatRoom = _.cloneDeep( roomItem );
+
+				//
+				//	only keep the owner alone
+				//
+				let owner : ChatRoomMember | null = RoomUtil.matchRoomOwner( invite.chatRoom.members );
+				if ( ! _.isObject( owner ) || _.isEmpty( owner ) )
+				{
+					return reject( `${ this.constructor.name } :: owner not found` );
+				}
+				if ( ChatType.PRIVATE === roomItem.chatType )
+				{
+					// if ( Object.keys( roomItem.members ).length >= 2 )
+					// {
+					// 	return reject( `${ this.constructor.name } :: number of members reached the upper limit for creating invitation` );
+					// }
+					if ( ! isHexString( owner.publicKey, 33 ) )
+					{
+						return reject( `${ this.constructor.name } :: invalid owner's publicKey` );
+					}
+					// if ( 0 !== owner.wallet.trim().toLowerCase().localeCompare( wallet.trim().toLowerCase() ) )
+					// {
+					// 	return reject( `${ this.constructor.name } :: only owner can create invitation` );
+					// }
+				}
+
+				//	put the owner as member
+				owner.wallet = owner.wallet.trim().toLowerCase();
+				invite.chatRoom.members = {
+					[ owner.wallet ] : owner
+				}
+
+				//	put my as member
+				const my : ChatRoomMember | null = RoomUtil.matchRoomMemberByWallet( roomItem.members, wallet );
+				//console.log( `inviteMember my :`, my );
+				if ( my )
+				{
+					const errorMy : string | null = VaChatRoomMember.validateChatRoomMember( my );
+					//console.log( `inviteMember my : errorMy :`, errorMy );
+					if ( my && null === errorMy )
+					{
+						//console.log( `inviteMember my : validated okay!` );
+						wallet = wallet.trim().toLowerCase();
+						invite.chatRoom.members[ wallet ] = my;
+					}
+				}
+
+				//	...
+				return resolve( invite );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	accept invitation
+	 *	@param inviteString	{string}		- the chat room and member information this invitation was sent from
+	 *	@param member		{ChatRoomMember}	- user currently accepting invitations
+	 *	@returns {Promise<ChatRoomEntityItem>}
+	 */
+	public acceptInvitation( inviteString : string, member : ChatRoomMember ) : Promise<ChatRoomEntityItem>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorMember : string | null = VaChatRoomMember.validateChatRoomMember( member );
+				if ( null !== errorMember )
+				{
+					return reject( errorMember );
+				}
+
+				const invite : InviteRequest = JSON.parse( inviteString );
+				if ( ! invite || invite.header !== clientInviteRequestInitV1.header )
+				{
+					return reject( `${ this.constructor.name }.acceptInvitation :: invalid inviteString` );
+				}
+
+				if ( ! _.isObject( invite.chatRoom.members ) || _.isEmpty( invite.chatRoom.members ) )
+				{
+					return reject( `${ this.constructor.name }.acceptInvitation :: invalid invite.chatRoom.members` );
+				}
+
+				//	check if room exists
+				const roomItem : ChatRoomEntityItem | null = await this.queryRoom( member.wallet, invite.chatRoom.roomId );
+				const roomExists : boolean = ( _.isObject( roomItem ) && ! _.isEmpty( roomItem ) );
+
+				let owner = RoomUtil.matchRoomOwner( invite.chatRoom.members );
+				if ( ! _.isObject( owner ) || _.isEmpty( owner ) )
+				{
+					return reject( `${ this.constructor.name }.acceptInvitation :: owner not found` );
+				}
+				if ( null !== VaChatRoomMember.validateChatRoomMember( owner ) )
+				{
+					return reject( `${ this.constructor.name }.acceptInvitation :: invalid owner` );
+				}
+
+				if ( ChatType.PRIVATE === invite.chatRoom.chatType )
+				{
+					if ( ! isHexString( owner.publicKey, 33 ) )
+					{
+						return reject( `${ this.constructor.name }.acceptInvitation :: invalid owner's publicKey` );
+					}
+					if ( ! isHexString( member.publicKey, 33 ) )
+					{
+						return reject( `${ this.constructor.name }.acceptInvitation :: invalid member's publicKey` );
+					}
+					if ( roomExists )
+					{
+						if ( 0 === owner.wallet.trim().toLowerCase().localeCompare( member.wallet.trim().toLowerCase() ) )
+						{
+							return reject( `${ this.constructor.name }.acceptInvitation :: unable to add yourself by wallet` );
+						}
+						if ( 0 === owner.publicKey.trim().toLowerCase().localeCompare( member.publicKey.trim().toLowerCase() ) )
+						{
+							return reject( `${ this.constructor.name }.acceptInvitation :: unable to add yourself by publicKey` );
+						}
+					}
+				}
+				else if ( ChatType.GROUP === invite.chatRoom.chatType )
+				{
+					if ( owner.wallet.trim().toLowerCase() === member.wallet.trim().toLowerCase() )
+					{
+						return reject( `${ this.constructor.name }.acceptInvitation :: unable to add yourself` );
+					}
+				}
+				else
+				{
+					return reject( `${ this.constructor.name }.acceptInvitation :: unsupported .chatType` );
+				}
+
+
+				//
+				//	put member to invite.chatRoom.members
+				//
+				const memberIsOwner = TypeUtil.isStringEqualNoCase( member.wallet, owner.wallet );
+				member.wallet = member.wallet.trim().toLowerCase();
+				invite.chatRoom.members[ member.wallet ] = {
+					...member,
+					memberType : memberIsOwner ? ChatRoomMemberType.OWNER : ChatRoomMemberType.MEMBER,
+				};
+
+				//
+				//	save the room to database
+				//
+				const item : ChatRoomEntityItem = {
+					wallet : member.wallet,
+					chatType : invite.chatRoom.chatType,
+					name : invite.chatRoom.name,
+					roomId : invite.chatRoom.roomId,
+					desc : invite.chatRoom.desc,
+					password : invite.chatRoom.password,
+					timestamp : invite.chatRoom.timestamp,
+					members : invite.chatRoom.members,
+				};
+
+				const errorItem : string | null = VaChatRoomEntityItem.validateChatRoomEntityItem( item );
+				if ( null !== errorItem )
+				{
+					return reject( errorItem );
+				}
+
+				const key : string | null = this.chatRoomStorageService.getKeyByItem( item );
+				if ( ! _.isString( key ) || _.isEmpty( key ) )
