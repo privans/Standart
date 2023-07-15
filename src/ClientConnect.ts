@@ -512,3 +512,137 @@ export class ClientConnect
 	 *	@returns {void}
 	 */
 	public countMessage( countMessageRequest : CountMessageRequest, callback ? : ResponseCallback ) : void
+	{
+		const errorCountMessageRequest : string | null = VaCountMessageRequest.validateCountMessageRequest( countMessageRequest );
+		if ( null !== errorCountMessageRequest )
+		{
+			throw new Error( `${ this.constructor.name }.countMessage :: ${ errorCountMessageRequest }` );
+		}
+
+		//	...
+		this.send( `count-message`, countMessageRequest, callback );
+	}
+
+	/**
+	 * 	asynchronously count message
+	 *
+	 *	@param countMessageRequest	{CountMessageRequest}
+	 *	@returns {Promise< CountMessageResponse | null >}
+	 */
+	public countMessageAsync( countMessageRequest : CountMessageRequest ) : Promise< CountMessageResponse | null >
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const errorCountMessageRequest : string | null = VaCountMessageRequest.validateCountMessageRequest( countMessageRequest );
+				if ( null !== errorCountMessageRequest )
+				{
+					return reject( `${ this.constructor.name }.countMessageAsync :: ${ errorCountMessageRequest }` );
+				}
+
+				//	...
+				const response : any = await this.sendAsync( `count-message`, countMessageRequest );
+				resolve( response ? response as CountMessageResponse : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+
+	/**
+	 * 	send event
+	 *
+	 *	@param eventName	{string}
+	 *	@param arg		{any}
+	 *	@param [callback]	{ResponseCallback}
+	 *	@param [retry]		{number}
+	 */
+	public send( eventName : string, arg : any, callback ? : ResponseCallback, retry ? : number ) : void
+	{
+		/**
+		 * 	@description
+		 * 	https://socket.io/docs/v4/
+		 */
+		this.socket.timeout( this.emitTimeout ).emit( eventName, arg, ( err : any, response : any ) =>
+		{
+			if ( err )
+			{
+				//
+				//	the other side did not acknowledge the event in the given delay.
+				//	let's retry
+				//
+				if ( undefined === retry )
+				{
+					retry = 0;
+				}
+				if ( retry > 3 )
+				{
+					throw new Error( `${ this.constructor.name }.send :: failed to send event : ${ eventName }, arg: ${ arg }`, );
+				}
+
+				//	...
+				this.send( eventName, arg, callback, ++retry );
+			}
+			else if ( _.isFunction( callback ) )
+			{
+				callback( response );
+			}
+		} );
+	}
+
+	/**
+	 * 	asynchronously send event
+	 *
+	 *	@param eventName	{string}
+	 *	@param arg		{any}
+	 *	@param [retry]		{number}
+	 *	@returns {Promise<any>}
+	 */
+	public sendAsync( eventName : string, arg : any, retry ? : number ) : Promise<any>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				/**
+				 * 	@description
+				 * 	https://socket.io/docs/v4/
+				 */
+				this.socket.timeout( this.emitTimeout ).emit( eventName, arg, async ( err : any, response : any ) =>
+				{
+					if ( err )
+					{
+						//
+						//	the other side did not acknowledge the event in the given delay.
+						//	let's retry
+						//
+						if ( undefined === retry )
+						{
+							retry = 0;
+						}
+						if ( retry > 3 )
+						{
+							return reject( `${ this.constructor.name }.sendAsync :: failed to send event : ${ eventName }, arg: ${ arg }` );
+						}
+
+						//	...
+						await TestUtil.sleep( 10 );
+						response = await this.sendAsync( eventName, arg, ++retry );
+					}
+
+					//	...
+					resolve( response );
+				} );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+}
