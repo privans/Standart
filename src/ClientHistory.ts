@@ -87,3 +87,46 @@ export class ClientHistory
 
 	/**
 	 *	@param roomId		{string}
+	 *	@param condition	{ConditionCallback}
+	 *	@returns {Promise<number>}
+	 */
+	markAsRead( roomId : string, condition ?: ConditionCallback ) : Promise<number>
+	{
+		return new Promise( async ( resolve, reject) =>
+		{
+			try
+			{
+				if ( ! VaChatRoomEntityItem.isValidRoomId( roomId ) )
+				{
+					return reject( `invalid roomId` );
+				}
+
+				//	...
+				const count : number =
+					await this.chatHistoryStorageService.update( ( key : string, item : any, index : number ) : boolean =>
+					{
+						if ( _.isFunction( condition ) )
+						{
+							return condition( key, item, index );
+						}
+						return item && ( ! item.read );
+
+					}, ( _key : string, item : any, _index : number ) : boolean =>
+					{
+						if ( item )
+						{
+							item.read = true;
+						}
+						return true;
+					} );
+
+				//	...
+				resolve( count );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+}
