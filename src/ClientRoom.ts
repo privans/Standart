@@ -380,3 +380,199 @@ export class ClientRoom
 
 				const key : string | null = this.chatRoomStorageService.getKeyByItem( item );
 				if ( ! _.isString( key ) || _.isEmpty( key ) )
+				{
+					return reject( `${ this.constructor.name }.acceptInvitation :: failed to get storage key` );
+				}
+
+				await this.chatRoomStorageService.put( key, item );
+				resolve( item );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param wallet		{string}
+	 *	@param roomId		{string}
+	 *	@returns {Promise<boolean>}
+	 */
+	public queryMembers( wallet : string, roomId : string ) : Promise<ChatRoomMembers>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const key : string = this.getStorageKey( wallet, roomId );
+				let roomItem : ChatRoomEntityItem | null = await this.chatRoomStorageService.get( key );
+				if ( ! roomItem )
+				{
+					return reject( `${ this.constructor.name }.queryMembers :: room not found` );
+				}
+				if ( ! _.isObject( roomItem.members ) )
+				{
+					roomItem.members = {};
+				}
+
+				//	...
+				resolve( roomItem.members );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param wallet		{string}
+	 *	@param roomId		{string}
+	 *	@param memberWallet	{string}
+	 *	@returns {Promise<ChatRoomMember | null>}
+	 */
+	public getMember( wallet : string, roomId : string, memberWallet : string ) : Promise<ChatRoomMember | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const key : string = this.getStorageKey( wallet, roomId );
+				const member : ChatRoomMember | null = await this.chatRoomStorageService.getMember( key, memberWallet );
+				resolve( member );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param wallet	{string}
+	 *	@param roomId	{string}
+	 *	@param member	{ChatRoomMember}
+	 *	@returns {Promise<boolean>}
+	 */
+	public putMember( wallet : string, roomId : string, member : ChatRoomMember )  : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const key : string = this.getStorageKey( wallet, roomId );
+				const roomItem : ChatRoomEntityItem | null = await this.chatRoomStorageService.get( key );
+				if ( roomItem && ChatType.PRIVATE === roomItem.chatType )
+				{
+					if ( _.isObject( roomItem.members ) &&
+						_.size( _.keys( roomItem.members ) ) >= 2 &&
+						! _.has( roomItem.members, member.wallet.trim().toLowerCase() ) )
+					{
+						return reject( `${ this.constructor.name }.putMember :: number of members reached the upper limit while putMember` );
+					}
+				}
+
+				const saved : boolean = await this.chatRoomStorageService.putMember( key, member );
+				resolve( saved );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param wallet		{string}
+	 *	@param roomId		{string}
+	 *	@param memberWallet	{string}
+	 *	@returns {Promise<boolean>}
+	 */
+	public deleteMember( wallet : string, roomId : string, memberWallet : string ) : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! EtherWallet.isValidAddress( memberWallet ) )
+				{
+					return reject( `${ this.constructor.name }.deleteMember :: invalid memberWallet` );
+				}
+
+				const key : string = this.getStorageKey( wallet, roomId );
+				const deleted : boolean = await this.chatRoomStorageService.deleteMember( key, memberWallet );
+				resolve( deleted );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param wallet		{string}
+	 *	@param roomId		{string}
+	 *	@param mute		{boolean}
+	 *	@returns {Promise<boolean>}
+	 */
+	public muteRoom( wallet : string, roomId : string, mute : boolean ) : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const key : string = this.getStorageKey( wallet, roomId );
+
+				//	query room from database
+				let roomItem : ChatRoomEntityItem | null = await this.chatRoomStorageService.get( key );
+				if ( ! roomItem )
+				{
+					return reject( `${ this.constructor.name }.muteRoom :: room not found` );
+				}
+
+				//	...
+				roomItem.mute = mute;
+				const saved : boolean = await this.chatRoomStorageService.put( key, roomItem );
+
+				//	...
+				resolve( saved );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param wallet	{string}
+	 *	@param roomId	{screen}
+	 *	@returns {string}
+	 *	@private
+	 */
+	private getStorageKey( wallet : string, roomId : string ) : string
+	{
+		const errorWallet : string | null = VaChatRoomEntityItem.isValidWallet( wallet );
+		if ( null !== errorWallet )
+		{
+			throw `${ this.constructor.name }.getStorageKey :: ${ errorWallet }`;
+		}
+
+		const errorRoomId : string | null = VaChatRoomEntityItem.isValidRoomId( roomId );
+		if ( null !== errorRoomId )
+		{
+			throw `${ this.constructor.name }.getStorageKey :: ${ errorRoomId }`;
+		}
+
+		const key : string | null = this.chatRoomStorageService.getKeyByWalletAndRoomId( wallet, roomId );
+		if ( ! key || ! this.chatRoomStorageService.isValidKey( key ) )
+		{
+			throw `${ this.constructor.name }.getStorageKey :: failed to get storage key`;
+		}
+
+		return key;
+	}
+
+}
