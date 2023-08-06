@@ -202,3 +202,42 @@ export class ClientRoomExtensions extends ClientRoom
 			{
 				const errorWallet : string | null = VaChatRoomEntityItem.isValidWallet( wallet );
 				if ( null !== errorWallet )
+				{
+					return reject( `${ this.constructor.name }.updateExtensionAll :: ${ errorWallet }` )
+				}
+
+				const errorRoomId : string | null = VaChatRoomEntityItem.isValidRoomId( roomId );
+				if ( null !== errorRoomId )
+				{
+					return reject( `${ this.constructor.name }.updateExtensionAll :: ${ errorRoomId }` );
+				}
+				if ( ! extensions )
+				{
+					return reject( `${ this.constructor.name }.updateExtensionAll :: invalid extensions` );
+				}
+
+				const room : ChatRoomEntityItem | null = await this.queryRoom( wallet, roomId );
+				if ( null === room )
+				{
+					return reject( `${ this.constructor.name }.updateExtensionAll :: room not found` );
+				}
+
+				//	update field
+				room.extensions = extensions;
+
+				//	try to save
+				const storeKey : string | null = this.chatRoomStorageService.getKeyByItem( room );
+				if ( ! _.isString( storeKey ) || _.isEmpty( storeKey ) )
+				{
+					return reject( `${ this.constructor.name }.updateExtensionAll :: failed to get storage key` );
+				}
+
+				return resolve( await this.chatRoomStorageService.put( storeKey, room ) );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+}
