@@ -181,3 +181,11 @@ export class ClientRoomLatestMessage extends ClientRoom
 				}
 
 				resolve( false );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+}
