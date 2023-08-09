@@ -11,4 +11,11 @@ import { BaseMessageBuilder } from "./BaseMessageBuilder";
 /**
  * 	@class
  */
-expo
+export class PrivateMessageBuilder extends BaseMessageBuilder
+{
+	/**
+	 *	@param privateKey	{string}
+	 *	@param chatMessage	{ChatMessage}
+	 *	@returns {SendMessageRequest}
+	 */
+	public buildMessag
