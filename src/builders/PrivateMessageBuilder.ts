@@ -18,4 +18,12 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 	 *	@param chatMessage	{ChatMessage}
 	 *	@returns {SendMessageRequest}
 	 */
-	public buildMessag
+	public buildMessage( privateKey : string, chatMessage : ChatMessage ) : Promise<SendMessageRequest>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! isHexString( privateKey, 32 ) )
+				{
+					r
