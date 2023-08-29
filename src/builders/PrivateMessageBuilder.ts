@@ -26,4 +26,9 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 			{
 				if ( ! isHexString( privateKey, 32 ) )
 				{
-					r
+					return reject( `${ this.constructor.name } :: invalid privateKey` );
+				}
+				if ( ! _.isObject( chatMessage ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid chatMessage` );
+	
