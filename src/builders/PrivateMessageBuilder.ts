@@ -37,3 +37,9 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 					return reject( `${ this.constructor.name } :: invalid .wallet` );
 				}
 				if ( null !== VaChatRoomEntityItem.isValidRoomId( chatMessage.roomId ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid .roomId` );
+				}
+				if ( ! _.isString( chatMessage.body ) || _.isEmpty( chatMessage.body ) )
+				{
+					return reject( `${ this.constructor.name
