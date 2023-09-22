@@ -42,4 +42,10 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 				}
 				if ( ! _.isString( chatMessage.body ) || _.isEmpty( chatMessage.body ) )
 				{
-					return reject( `${ this.constructor.name
+					return reject( `${ this.constructor.name } :: invalid .body` );
+				}
+
+				//	...
+				const roomItem : ChatRoomEntityItem | null = await this.clientRoom.queryRoom( chatMessage.wallet, chatMessage.roomId );
+				if ( ! roomItem )
+				{
