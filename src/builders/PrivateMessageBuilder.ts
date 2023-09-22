@@ -55,4 +55,10 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 				//	encrypt body
 				chatMessage.body = await new PrivateMessageCrypto().encryptMessage(
 					chatMessage.body,
-					room
+					roomItem,
+					chatMessage.wallet,
+					privateKey
+				);
+				chatMessage.timestamp = new Date().getTime();
+				chatMessage.sig = await Web3Signer.signObject( privateKey, chatMessage );
+				chatMessage.ha
