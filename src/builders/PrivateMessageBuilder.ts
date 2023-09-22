@@ -49,3 +49,10 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 				const roomItem : ChatRoomEntityItem | null = await this.clientRoom.queryRoom( chatMessage.wallet, chatMessage.roomId );
 				if ( ! roomItem )
 				{
+					return reject( `${ this.constructor.name } :: room not found` );
+				}
+
+				//	encrypt body
+				chatMessage.body = await new PrivateMessageCrypto().encryptMessage(
+					chatMessage.body,
+					room
