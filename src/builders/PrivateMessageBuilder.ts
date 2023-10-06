@@ -61,4 +61,11 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 				);
 				chatMessage.timestamp = new Date().getTime();
 				chatMessage.sig = await Web3Signer.signObject( privateKey, chatMessage );
-				chatMessage.ha
+				chatMessage.hash = await Web3Digester.hashObject( chatMessage );
+				const sendMessageRequest : SendMessageRequest = {
+					payload : chatMessage
+				};
+
+				//	...
+				resolve( sendMessageRequest );
+			}
