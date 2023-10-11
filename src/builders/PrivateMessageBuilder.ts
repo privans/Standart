@@ -69,3 +69,10 @@ export class PrivateMessageBuilder extends BaseMessageBuilder
 				//	...
 				resolve( sendMessageRequest );
 			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+}
