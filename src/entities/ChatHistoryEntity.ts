@@ -12,4 +12,10 @@ export interface ChatHistoryEntityItem
 	/**
 	 * 	chat room id of the message recipient
 	 * 	@type {string}
-	 * 	
+	 * 	@description start with 'p'|'g', and, max length was limited to 42-256
+	 */
+	roomId : string;
+
+	/**
+	 * 	@type {string}
+	 * 	@description user name, max length was limited to 3-
