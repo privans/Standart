@@ -18,4 +18,16 @@ export interface ChatHistoryEntityItem
 
 	/**
 	 * 	@type {string}
-	 * 	@description user name, max length was limited to 3-
+	 * 	@description user name, max length was limited to 3-64
+	 */
+	userName : string;
+
+	/**
+	 * 	@type {string}
+	 * 	@description url of user avatar, max length was limited to 256
+	 */
+	userAvatar? : string;
+
+	/**
+	 * 	@type {string}
+	 * 	@descripti
