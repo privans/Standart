@@ -10,3 +10,12 @@ export class Constants
 	static maxLengthRoomName : number	= 64;
 
 	static minLengthRoomId : number		= 42;
+	static maxLengthRoomId : number		= 256;
+
+	static maxLengthDesc : number		= 256;
+
+	static maxLengthPassword : number	= 256;
+
+	static maxLengthBody : number		= 4096;
+
+	static maxLengthHash : nu
