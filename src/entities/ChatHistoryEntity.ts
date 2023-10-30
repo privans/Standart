@@ -30,4 +30,17 @@ export interface ChatHistoryEntityItem
 
 	/**
 	 * 	@type {string}
-	 * 	@descripti
+	 * 	@description body text
+	 */
+	body : string;
+
+	/**
+	 * 	@type {boolean}
+	 * 	@description true - already been read
+	 */
+	read? : boolean;
+
+	/**
+	 *	@type {number}
+	 *	@description created time in millisecond
+	 
