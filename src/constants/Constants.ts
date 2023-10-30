@@ -18,4 +18,7 @@ export class Constants
 
 	static maxLengthBody : number		= 4096;
 
-	static maxLengthHash : nu
+	static maxLengthHash : number		= 66;
+
+	static maxLengthSig : number		= 132;
+}
