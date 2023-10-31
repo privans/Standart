@@ -43,4 +43,21 @@ export interface ChatHistoryEntityItem
 	/**
 	 *	@type {number}
 	 *	@description created time in millisecond
-	 
+	 */
+	timestamp : number;
+}
+
+/**
+ * 	@interface
+ */
+export interface ChatHistoryEntity extends DBSchema
+{
+	//	store name
+	root: {
+		key: string;
+		value: string;
+	};
+	// root : {
+	// 	key : string;
+	// 	value : {
+	// 		r
