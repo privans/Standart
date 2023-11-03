@@ -60,4 +60,13 @@ export interface ChatHistoryEntity extends DBSchema
 	// root : {
 	// 	key : string;
 	// 	value : {
-	// 		r
+	// 		roomId : string;
+	// 		userName : string;
+	// 		userAvatar? : string;
+	// 		body : string;
+	// 		read? : boolean;
+	// 		timestamp : number;
+	// 	};
+	// 	indexes : { 'by-roomId' : string };
+	// };
+}
