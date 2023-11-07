@@ -53,3 +53,39 @@ export * from "./builders/BaseMessageBuilder";
 export * from "./builders/GroupMessageBuilder";
 export * from "./builders/PrivateMessageBuilder";
 
+
+/**
+ * 	cryptos
+ */
+export * from "./cryptos/GroupMessageCrypto";
+export * from "./cryptos/PrivateMessageCrypto";
+
+
+/**
+ * 	validators
+ */
+export * from "./validators/VaChatHistoryEntityItem";
+export * from "./validators/VaChatRoomEntityItem";
+export * from "./validators/VaChatRoomMember";
+export * from "./validators/VaCreateChatRoom";
+export * from "./validators/VaExistRoomRequest";
+export * from "./validators/VaJoinRoomRequest";
+export * from "./validators/VaLeaveRoomRequest";
+export * from "./validators/VaSendMessageRequest";
+export * from "./validators/VaPullMessageRequest";
+export * from "./validators/VaCountMessageRequest";
+
+
+/**
+ * 	utils
+ */
+export * from "./utils/RoomUtil";
+
+
+/**
+ * 	client
+ */
+export * from "./ClientConnect";
+export * from "./ClientHistory";
+export * from "./ClientRoom";
+export * from "./ClientRoomLatestMessage";
