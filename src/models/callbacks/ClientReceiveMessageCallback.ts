@@ -1,0 +1,4 @@
+/**
+ * 	define
+ */
+export type ClientReceiveMessageCallback = ( 

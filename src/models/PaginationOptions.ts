@@ -11,4 +11,12 @@ export enum PaginationOrder
 	DESC = 2
 }
 
-/*
+/**
+ * 	@export
+ */
+export interface PaginationOptions
+{
+	pageNo ?: number;
+	pageSize ?: number;
+	order ?: PaginationOrder;
+}
