@@ -1,4 +1,4 @@
 /**
  * 	define
  */
-export type ServerSendMessageCa
+export type ServerSendMessageCallback = ( serverId: string, data: any, options ?: any ) => boolean;
