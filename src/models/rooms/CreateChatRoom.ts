@@ -26,4 +26,12 @@ export interface CreateChatRoom
 
 	/**
 	 * 	@type {string}
-	 * 	@descripti
+	 * 	@description encryption Key, max length was limited to 8-64
+	 */
+	encryptionKey ?: string;
+
+	/**
+	 * 	@type {string}
+	 * 	@description max length was limited to 4-16
+	 */
+	pinCode ?: string;
