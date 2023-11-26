@@ -13,4 +13,17 @@ export interface CreateChatRoom
 	wallet : string;
 
 	/**
-	 *
+	 * 	@type {ChatType}
+	 */
+	chatType : ChatType;
+
+	/**
+	 * 	chat room name
+	 * 	@type {string}
+	 * 	@description max length was limited to 3-64
+	 */
+	name : string;
+
+	/**
+	 * 	@type {string}
+	 * 	@descripti
