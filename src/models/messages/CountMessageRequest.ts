@@ -29,4 +29,7 @@ export type CountMessageOptionItem =
 	lastElement ?: number;
 };
 
-ex
+export type CountMessageRequest =
+{
+	options : Array< CountMessageOptionItem >;
+};
