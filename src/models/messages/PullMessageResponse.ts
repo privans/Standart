@@ -13,4 +13,7 @@ export interface QueueMessageItem
 
 export interface PullMessageResponse extends BaseResponse
 {
-	total
+	total : number,
+	pageKey : number,
+	list : Array< QueueMessageItem | null >,
+}
