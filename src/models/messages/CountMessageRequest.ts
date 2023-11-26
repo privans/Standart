@@ -17,4 +17,16 @@ export type CountMessageOptionItem =
 
 	/**
 	 * 	if the user specifies this parameter,
-	 * 	statistics will end with this param
+	 * 	statistics will end with this parameter.
+	 * 	default to -1
+	 */
+	endTimestamp ?: number;
+
+	/**
+	 * 	if the user specifies this parameter,
+	 * 	the last [lastElement] elements will be returned.
+	 */
+	lastElement ?: number;
+};
+
+ex
