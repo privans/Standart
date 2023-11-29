@@ -35,3 +35,14 @@ export interface CreateChatRoom
 	 * 	@description max length was limited to 4-16
 	 */
 	pinCode ?: string;
+
+	/**
+	 * 	chat room id of the message recipient
+	 * 	@type {string}
+	 * 	@description start with 'p'|'g', and, max length was limited to 42-256
+	 */
+	roomId ?: string;
+
+	/**
+	 * 	@type {string}
+	 * 	@descriptio
