@@ -45,4 +45,13 @@ export interface CreateChatRoom
 
 	/**
 	 * 	@type {string}
-	 * 	@descriptio
+	 * 	@description room description, max length was limited to 256
+	 */
+	desc ?: string;
+
+	/**
+	 * 	@type {ChatRoomMembers}
+	 * 	@description member list
+	 */
+	members : ChatRoomMembers;
+}
