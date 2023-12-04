@@ -165,3 +165,211 @@ export abstract class AbstractStorageService<T> implements IStorageService
 			}
 		} );
 	}
+
+	/**
+	 *	@param key	- wallet address is the key
+	 *	@returns {Promise<boolean>}
+	 */
+	public async delete( key : string ) : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! TypeUtil.isNotEmptyString( key ) )
+				{
+					return reject( `invalid key for .delete` );
+				}
+
+				await this.init();
+				await this.db.delete( 'root', key );
+				resolve( true );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	get item by key
+	 *	@param key
+	 *	@returns {Promise<* | null>}
+	 */
+	public async get( key : string ) : Promise<T | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! TypeUtil.isNotEmptyString( key ) )
+				{
+					return reject( `invalid key for .get` );
+				}
+
+				await this.init();
+				await TestUtil.sleep( 1 );
+
+				const encrypted : string | undefined = await this.db.get( 'root', key );
+				if ( encrypted )
+				{
+					const value : T | null = await this.decodeItem( encrypted );
+					return resolve( value ? value : null );
+				}
+
+				//	...
+				resolve( null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 *	Put an item into the database, and will replace the item with the same key.
+	 *	@param key
+	 *	@param value
+	 *	@returns {Promise<boolean>}
+	 */
+	public async put( key : string, value : T ) : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( null !== this.isValidItem( value ) )
+				{
+					return reject( `invalid value for :put` );
+				}
+				if ( ! TypeUtil.isNotEmptyString( key ) )
+				{
+					return reject( `invalid key for :put` );
+				}
+
+				//	...
+				await this.init();
+				const encrypted : string = await this.encodeItem( value );
+				await this.db.put( this.storeName, encrypted, key );
+				resolve( true );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	get the first item
+	 * 	@returns {Promise<* | null>}
+	 */
+	public async getFirst() : Promise<T | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				const firstItems : Array<T | null> | null = await this.getAll( undefined, 1 );
+				if ( Array.isArray( firstItems ) && 1 === firstItems.length )
+				{
+					return resolve( firstItems[ 0 ] );
+				}
+
+				//	...
+				resolve( null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	get all of keys
+	 *	@param query
+	 *	@param maxCount
+	 *	@returns {Promise<Array<string> | null>}
+	 */
+	public async getAllKeys( query? : string, maxCount? : number ) : Promise<Array<string> | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				await this.init();
+				const value : Array<string> | null = await this.db.getAllKeys( 'root', query, maxCount );
+				resolve( value ? value : null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	query all items
+	 *	@param query
+	 *	@param maxCount
+	 *	@returns {Promise<Array< * | null > | null>}
+	 */
+	public async getAll( query? : string, maxCount? : number ) : Promise<Array<T | null> | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				await this.init();
+				const list : Array<string> | null = await this.db.getAll( 'root', query, maxCount );
+				if ( Array.isArray( list ) && list.length > 0 )
+				{
+					let objectList : Array<T | null> = [];
+					for ( const encrypted of list )
+					{
+						let object : T | null = null;
+						try
+						{
+							object = await this.decodeItem( encrypted );
+						}
+						catch ( err )
+						{
+							console.error( err );
+						}
+
+						//	...
+						objectList.push( object );
+					}
+
+					//	...
+					return resolve( objectList );
+				}
+
+				//	...
+				resolve( null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	query items
+	 *	@param condition	{ConditionCallback}
+	 *	@param pageOptions	{PaginationOptions}
+	 *	@returns {Promise<Array< * | null > | null>}
+	 */
+	public async query( condition ?: ConditionCallback, pageOptions ?: PaginationOptions ) : Promise<Array<T | null> | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				await this.init();
+
+				const pageNo : number = PageUtil.getSafePageNo( pageOptions?.pageNo );
