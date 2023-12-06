@@ -373,3 +373,197 @@ export abstract class AbstractStorageService<T> implements IStorageService
 				await this.init();
 
 				const pageNo : number = PageUtil.getSafePageNo( pageOptions?.pageNo );
+				const pageSize : number = PageUtil.getSafePageSize( pageOptions?.pageSize );
+
+				let objectList : Array<T | null> = [];
+				const tx = this.db.transaction( this.storeName );
+				let cursor = await tx.store.openCursor();
+				let index = 0;
+				while ( cursor )
+				{
+					//console.log( cursor.key, cursor.value );
+
+					//	decrypt
+					let cursorObject : T | null = null;
+					try
+					{
+						const encrypted : string = cursor.value;
+						cursorObject = await this.decodeItem( encrypted );
+					}
+					catch ( err )
+					{
+						console.error( err );
+					}
+
+					//	...
+					let well : boolean = true;
+					if ( _.isFunction( condition ) )
+					{
+						//	do not check whether cursorObject equal to null or undefined
+						//	just passes it to user
+						well = condition( cursor.key, cursorObject, index );
+					}
+					if ( well )
+					{
+						if ( PageUtil.pageCondition( index, pageNo, pageSize ) )
+						{
+							objectList.push( cursorObject );
+						}
+
+						//	...
+						index++;
+					}
+
+					if ( objectList.length >= pageSize )
+					{
+						break;
+					}
+
+					//	next
+					cursor = await cursor.continue();
+				}
+				await tx.done;
+
+				//	...
+				resolve( objectList );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 *	@param condition	{ConditionCallback}
+	 *	@param updateHandler	{HandlerCallback}
+	 *	@returns {Promise<number>}
+	 */
+	update( condition : ConditionCallback, updateHandler : HandlerCallback ) : Promise<number>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! _.isFunction( condition ) )
+				{
+					return reject( `invalid condition` );
+				}
+				if ( ! _.isFunction( updateHandler ) )
+				{
+					return reject( `invalid handler` );
+				}
+
+				await this.init();
+
+				const tx = this.db.transaction( this.storeName );
+				let cursor = await tx.store.openCursor();
+				let index = 0;
+				let updated = 0;
+				while ( cursor )
+				{
+					//	decode/decrypt
+					let cursorObject : T | null = null;
+					try
+					{
+						const encrypted = cursor.value;
+						cursorObject = await this.decodeItem( encrypted );
+					}
+					catch ( err )
+					{
+						console.error( err );
+					}
+
+					//	do not check whether cursorObject equal to null or undefined
+					//	just passes it to user
+					if ( condition( cursor.key, cursorObject, index ) )
+					{
+						updateHandler( cursor.key, cursorObject, index );
+						if ( cursorObject )
+						{
+							//cursor.update( await this.encodeItem( cursorObject ) );
+							if ( await this.put( cursor.key, cursorObject ) )
+							{
+								updated ++;
+							}
+						}
+
+						//	...
+						index++;
+					}
+
+					//	next
+					cursor = await cursor.continue();
+				}
+				await tx.done;
+
+				//	...
+				resolve( updated );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
+
+	/**
+	 * 	Retrieves the number of records matching the given condition
+	 *	@param condition	{ConditionCallback}
+	 *	@returns {Promise<number>}
+	 */
+	public async count( condition ?: ConditionCallback ) : Promise<number>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				await this.init();
+				let count : number = 0;
+				if ( _.isFunction( condition ) )
+				{
+					const tx = this.db.transaction( this.storeName );
+					let cursor = await tx.store.openCursor();
+					let index = 0;
+					while ( cursor )
+					{
+						//console.log( cursor.key, cursor.value );
+
+						//	decrypt
+						let cursorObject : T | null = null;
+						try
+						{
+							const encrypted = cursor.value;
+							cursorObject = await this.decodeItem( encrypted );
+						}
+						catch ( err )
+						{
+							console.error( err );
+						}
+
+						//	do not check whether cursorObject equal to null or undefined
+						//	just passes it to user
+						if ( condition( cursor.key, cursorObject, index ) )
+						{
+							count ++;
+						}
+
+						//	next
+						cursor = await cursor.continue();
+					}
+					await tx.done;
+				}
+				else
+				{
+					count = await this.db.count( this.storeName );
+				}
+
+				//	...
+				resolve( count );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		} );
+	}
