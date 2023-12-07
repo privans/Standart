@@ -196,3 +196,211 @@ export class ChatHistoryStorageService extends AbstractStorageService<ChatHistor
 
 
 	//
+	// /**
+	//  * 	get item by key
+	//  *	@param key
+	//  *	@returns {Promise<* | null>}
+	//  */
+	// public async get( key : string ) : Promise<ChatHistoryEntityItem | null>
+	// {
+	// 	return new Promise( async ( resolve, reject ) =>
+	// 	{
+	// 		try
+	// 		{
+	// 			if ( ! TypeUtil.isNotEmptyString( key ) )
+	// 			{
+	// 				return reject( `invalid key for .get` );
+	// 			}
+	//
+	// 			await this.init();
+	// 			await TestUtil.sleep( 1 );
+	//
+	// 			const stringifyValue : string | undefined = await this.db.get( 'root', key );
+	// 			if ( stringifyValue )
+	// 			{
+	// 				const value : ChatHistoryEntityItem | null = await this.decodeItem( stringifyValue );
+	// 				return resolve( value ? value : null );
+	// 			}
+	//
+	// 			//	...
+	// 			resolve( null );
+	// 		}
+	// 		catch ( err )
+	// 		{
+	// 			reject( err );
+	// 		}
+	// 	});
+	// }
+	//
+	// /**
+	//  * 	Put an item into the database, and will replace the item with the same key.
+	//  *	@param key
+	//  *	@param value
+	//  *	@returns {Promise<boolean>}
+	//  */
+	// public async put( key: string, value : ChatHistoryEntityItem ) : Promise<boolean>
+	// {
+	// 	return new Promise( async ( resolve, reject ) =>
+	// 	{
+	// 		try
+	// 		{
+	// 			if ( null !== this.isValidItem( value ) )
+	// 			{
+	// 				return reject( `invalid value for .put` );
+	// 			}
+	// 			if ( ! TypeUtil.isNotEmptyString( key ) )
+	// 			{
+	// 				return reject( `invalid key for .put` );
+	// 			}
+	//
+	// 			if ( ! value.timestamp )
+	// 			{
+	// 				const ts = parseInt( key );
+	// 				value.timestamp = ( _.isNumber( ts ) && ts > 0 ) ? ts : new Date().getTime();
+	// 			}
+	//
+	// 			//	...
+	// 			await this.init();
+	// 			const stringifyValue : string = await this.encodeItem( value );
+	// 			await this.db.put( 'root', stringifyValue, key );
+	// 			resolve( true );
+	// 		}
+	// 		catch ( err )
+	// 		{
+	// 			reject( err );
+	// 		}
+	// 	});
+	// }
+	//
+	// /**
+	//  * 	query all items
+	//  *	@param query
+	//  *	@param maxCount
+	//  *	@returns {Promise<Array< ChatHistoryEntityItem | null > | null>}
+	//  */
+	// public async getAll( query? : string, maxCount? : number ) : Promise<Array< ChatHistoryEntityItem | null > | null>
+	// {
+	// 	return new Promise( async ( resolve, reject ) =>
+	// 	{
+	// 		try
+	// 		{
+	// 			await this.init();
+	// 			const list : Array<string> | Array<ChatHistoryEntityItem> | null = await this.db.getAll( 'root', query, maxCount );
+	// 			if ( Array.isArray( list ) && list.length > 0 )
+	// 			{
+	// 				let objectList : Array< ChatHistoryEntityItem | null > = [];
+	// 				for ( let stringValue of list )
+	// 				{
+	// 					const object : ChatHistoryEntityItem | null = await this.decodeItem( stringValue );
+	// 					if ( ! _.isObject( object ) )
+	// 					{
+	// 						continue;
+	// 					}
+	//
+	// 					//	...
+	// 					objectList.push( object );
+	// 				}
+	//
+	// 				//	...
+	// 				return resolve( objectList );
+	// 			}
+	//
+	// 			//	...
+	// 			resolve( null );
+	// 		}
+	// 		catch ( err )
+	// 		{
+	// 			reject( err );
+	// 		}
+	// 	});
+	// }
+	//
+	// /**
+	//  * 	query items
+	//  *	@param condition	{ConditionCallback}
+	//  *	@param pageOptions	{PaginationOptions}
+	//  *	@returns {Promise<Array< ChatHistoryEntityItem | null > | null>}
+	//  */
+	// public async query( condition ?: ConditionCallback, pageOptions ?: PaginationOptions ) : Promise<Array< ChatHistoryEntityItem | null > | null>
+	// {
+	// 	return new Promise( async ( resolve, reject ) =>
+	// 	{
+	// 		try
+	// 		{
+	// 			await this.init();
+	//
+	// 			const pageNo : number = PageUtil.getSafePageNo( pageOptions?.pageNo );
+	// 			const pageSize : number = PageUtil.getSafePageSize( pageOptions?.pageSize );
+	//
+	// 			let objectList : Array< ChatHistoryEntityItem | null > = [];
+	// 			const tx = this.db.transaction( this.storeName );
+	// 			let cursor = await tx.store.openCursor();
+	// 			let index = 0;
+	// 			while ( cursor )
+	// 			{
+	// 				//console.log( cursor.key, cursor.value );
+	// 				let cursorObject : ChatHistoryEntityItem | null = await this.decodeItem( String( cursor.value ) );
+	// 				let well : boolean = true;
+	// 				if ( _.isFunction( condition ) )
+	// 				{
+	// 					well = condition( cursor.key, cursorObject, index );
+	// 				}
+	// 				if ( well )
+	// 				{
+	// 					if ( PageUtil.pageCondition( index, pageNo, pageSize ) )
+	// 					{
+	// 						objectList.push( cursorObject );
+	// 					}
+	//
+	// 					//	...
+	// 					index ++;
+	// 				}
+	//
+	// 				if ( objectList.length >= pageSize )
+	// 				{
+	// 					break;
+	// 				}
+	//
+	// 				//	next
+	// 				cursor = await cursor.continue();
+	// 			}
+	// 			await tx.done;
+	//
+	// 			//	...
+	// 			resolve( objectList );
+	// 		}
+	// 		catch ( err )
+	// 		{
+	// 			reject( err );
+	// 		}
+	// 	});
+	// }
+	//
+	//
+	// /**
+	//  *	@param condition	{ConditionCallback}
+	//  *	@param handler		{HandlerCallback}
+	//  *	@returns {Promise<number>}
+	//  */
+	// update( condition : ConditionCallback, handler : HandlerCallback ) : Promise<number>
+	// {
+	// 	return new Promise( async ( resolve, reject ) =>
+	// 	{
+	// 		try
+	// 		{
+	// 			if ( ! _.isFunction( condition ) )
+	// 			{
+	// 				return reject( `invalid condition` );
+	// 			}
+	// 			if ( ! _.isFunction( handler ) )
+	// 			{
+	// 				return reject( `invalid handler` );
+	// 			}
+	//
+	// 			await this.init();
+	//
+	// 			const tx = this.db.transaction( this.storeName );
+	// 			let cursor = await tx.store.openCursor();
+	// 			let index = 0;
+	// 			let updated = 0;
+	// 			while ( cursor )
