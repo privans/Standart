@@ -404,3 +404,38 @@ export class ChatHistoryStorageService extends AbstractStorageService<ChatHistor
 	// 			let index = 0;
 	// 			let updated = 0;
 	// 			while ( cursor )
+	// 			{
+	// 				let cursorObject : ChatHistoryEntityItem | null = await this.decodeItem( String( cursor.value ) );
+	//
+	// 				//	do not check whether cursorObject equal to null or undefined
+	// 				//	just passes it to user
+	// 				if ( condition( cursor.key, cursorObject, index ) )
+	// 				{
+	// 					handler( cursor.key, cursorObject, index );
+	// 					if ( cursorObject )
+	// 					{
+	// 						if ( await this.put( cursor.key, cursorObject ) )
+	// 						{
+	// 							updated ++;
+	// 						}
+	// 					}
+	//
+	// 					//	...
+	// 					index++;
+	// 				}
+	//
+	// 				//	next
+	// 				cursor = await cursor.continue();
+	// 			}
+	// 			await tx.done;
+	//
+	// 			//	...
+	// 			resolve( updated );
+	// 		}
+	// 		catch ( err )
+	// 		{
+	// 			reject( err );
+	// 		}
+	// 	} );
+	// }
+}
