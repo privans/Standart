@@ -567,3 +567,13 @@ export abstract class AbstractStorageService<T> implements IStorageService
 			}
 		} );
 	}
+
+	/**
+	 *	@param value	{any}
+	 *	@returns {string | null}
+	 */
+	getKeyByItem( value : any ) : string | null
+	{
+		return null;
+	}
+}
