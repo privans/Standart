@@ -170,3 +170,206 @@ export class ChatRoomStorageService extends AbstractStorageService<ChatRoomEntit
 				if ( ! this.isValidKey( key ) )
 				{
 					return reject( `${ this.constructor.name } :: invalid key for :put` );
+				}
+
+				const errorItem : string | null = this.isValidItem( value );
+				if ( null !== errorItem )
+				{
+					return reject( errorItem );
+				}
+
+				if ( ! value.timestamp )
+				{
+					value.timestamp = new Date().getTime();
+				}
+
+				//	...
+				resolve( await super.put( key, value ) );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+
+	/**
+	 *	@param key	{string} room id
+	 *	@returns {Promise<ChatRoomMembers | null>}
+	 */
+	public getMembers( key: string ) : Promise<ChatRoomMembers | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! this.isValidKey( key ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid key for :getMembers` );
+				}
+
+				let item : ChatRoomEntityItem | null = await this.get( key );
+				if ( ! item )
+				{
+					return reject( `item not found by key: ${ key }` );
+				}
+
+				return resolve( item.members );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param key		{string} room id
+	 *	@param memberWallet	{string} wallet address
+	 *	@returns {Promise<ChatRoomMember | null>}
+	 */
+	public getMember( key: string, memberWallet : string ) : Promise<ChatRoomMember | null>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! this.isValidKey( key ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid key for :getMember` );
+				}
+				if ( ! _.isString( memberWallet ) || _.isEmpty( memberWallet ) )
+				{
+					return reject( `invalid memberWallet` );
+				}
+				if ( ! EtherWallet.isValidAddress( memberWallet ) )
+				{
+					return reject( `invalid memberWallet, invalid address` );
+				}
+
+				let item : ChatRoomEntityItem | null = await this.get( key );
+				if ( ! item )
+				{
+					return reject( `item not found by key: ${ key }` );
+				}
+
+				memberWallet = memberWallet.trim().toLowerCase();
+				if ( item.members &&
+					_.has( item.members, memberWallet ) )
+				{
+					const member : ChatRoomMember = item.members[ memberWallet ];
+					return resolve( member );
+				}
+
+				//	...
+				resolve( null );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param key	{string}	- key/roomId
+	 *	@param member	{ChatRoomMember}
+	 *	@returns {Promise<boolean>}
+	 */
+	public putMember( key: string, member : ChatRoomMember )  : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! this.isValidKey( key ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid key for :putMember` );
+				}
+
+				//	validate member
+				const errorChatRoomMember : string | null = VaChatRoomMember.validateChatRoomMember( member );
+				if ( null !== errorChatRoomMember )
+				{
+					return reject( errorChatRoomMember );
+				}
+
+				//	...
+				let item : ChatRoomEntityItem | null = await this.get( key );
+				if ( ! item )
+				{
+					return reject( `item not found by key: ${ key }` );
+				}
+
+				if ( ! item.members )
+				{
+					item.members = {};
+				}
+				member.wallet = member.wallet.trim().toLowerCase();
+				if ( ! member.timestamp )
+				{
+					member.timestamp = new Date().getTime();
+				}
+				item.members[ member.wallet ] = member;
+
+				//	...
+				const saved : boolean = await this.put( key, item );
+				resolve( saved );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+
+	/**
+	 *	@param key		{string}
+	 *	@param memberWallet	{string}
+	 *	@returns {Promise<boolean>}
+	 */
+	public deleteMember( key: string, memberWallet : string ) : Promise<boolean>
+	{
+		return new Promise( async ( resolve, reject ) =>
+		{
+			try
+			{
+				if ( ! this.isValidKey( key ) )
+				{
+					return reject( `${ this.constructor.name } :: invalid key for :deleteMember` );
+				}
+				if ( ! _.isString( memberWallet ) || _.isEmpty( memberWallet ) )
+				{
+					return reject( `invalid memberWallet` );
+				}
+				if ( ! EtherWallet.isValidAddress( memberWallet ) )
+				{
+					return reject( `invalid memberWallet, invalid address` );
+				}
+
+				let item : ChatRoomEntityItem | null = await this.get( key );
+				if ( ! item )
+				{
+					return reject( `item not found by key: ${ key }` );
+				}
+
+				memberWallet = memberWallet.trim().toLowerCase();
+				if ( item.members &&
+					_.has( item.members, memberWallet ) )
+				{
+					delete item.members[ memberWallet ];
+					const saved : boolean = await this.put( key, item );
+					return resolve( saved );
+				}
+
+				//	...
+				resolve( false );
+			}
+			catch ( err )
+			{
+				reject( err );
+			}
+		});
+	}
+}
