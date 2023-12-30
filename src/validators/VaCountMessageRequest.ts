@@ -68,3 +68,7 @@ export class VaCountMessageRequest
 				return `invalid .options, ${ errorOption }`;
 			}
 		}
+
+		return null;
+	}
+}
