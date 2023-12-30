@@ -226,3 +226,44 @@ export class VaChatRoomEntityItem
 		if ( null !== errorRoomName )
 		{
 			return errorRoomName;
+		}
+
+		const errorRoomId : string | null = this.isValidRoomId( item.roomId );
+		if ( null !== errorRoomId )
+		{
+			return errorRoomId;
+		}
+
+		if ( _.isString( item.desc ) )
+		{
+			const errorDesc : string | null = this.isValidDesc( item.desc );
+			if ( null !== errorDesc )
+			{
+				return errorDesc;
+			}
+		}
+
+		if ( undefined !== item.mute )
+		{
+			const errorMute : string | null = this.isValidMute( item.mute );
+			if ( null !== errorMute )
+			{
+				return errorMute;
+			}
+		}
+
+		const errorPassword : string | null = this.isValidPassword( item.password );
+		if ( null !== errorPassword )
+		{
+			return errorPassword;
+		}
+
+		const errorMembers : string | null = this.isValidMembers( item.members );
+		if ( null !== errorMembers )
+		{
+			return errorMembers;
+		}
+
+		return null;
+	}
+}
