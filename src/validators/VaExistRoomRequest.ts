@@ -10,4 +10,11 @@ export class VaExistRoomRequest
 	 *	@param existRoomRequest	{ExistRoomRequest}
 	 *	@returns {string | null}
 	 */
-	static val
+	static validateExistRoomRequest( existRoomRequest : ExistRoomRequest ) : string | null
+	{
+		if ( ! existRoomRequest )
+		{
+			return `invalid existInRoomRequest`;
+		}
+
+		const errorRoomId : string |
