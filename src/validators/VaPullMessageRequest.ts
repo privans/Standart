@@ -13,4 +13,10 @@ export class VaPullMessageRequest
 	 */
 	static validatePullMessageRequest( pullRequest : PullMessageRequest ) : string | null
 	{
-		if
+		if ( ! pullRequest )
+		{
+			return `invalid pullRequest`;
+		}
+
+		const errorRoomId : string | null = VaChatRoomEntityItem.isValidRoomId( pullRequest.roomId );
+		if ( null !=
