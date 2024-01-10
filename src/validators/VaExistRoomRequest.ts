@@ -17,4 +17,13 @@ export class VaExistRoomRequest
 			return `invalid existInRoomRequest`;
 		}
 
-		const errorRoomId : string |
+		const errorRoomId : string | null = VaChatRoomEntityItem.isValidRoomId( existRoomRequest.roomId );
+		if ( null !== errorRoomId )
+		{
+			return errorRoomId;
+		}
+
+		//	...
+		return null;
+	}
+}
