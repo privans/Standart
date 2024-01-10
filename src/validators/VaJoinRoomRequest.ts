@@ -7,4 +7,11 @@ import { VaChatRoomEntityItem } from "./VaChatRoomEntityItem";
 export class VaJoinRoomRequest
 {
 	/**
-	 *	@param joinRoo
+	 *	@param joinRoomRequest	{JoinRoomRequest}
+	 *	@returns {string | null}
+	 */
+	static validateJoinRoomRequest( joinRoomRequest : JoinRoomRequest ) : string | null
+	{
+		if ( ! joinRoomRequest )
+		{
+			return `invalid joinRoomRe
