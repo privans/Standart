@@ -14,4 +14,16 @@ export class VaJoinRoomRequest
 	{
 		if ( ! joinRoomRequest )
 		{
-			return `invalid joinRoomRe
+			return `invalid joinRoomRequest`;
+		}
+
+		const errorRoomId : string | null = VaChatRoomEntityItem.isValidRoomId( joinRoomRequest.roomId );
+		if ( null !== errorRoomId )
+		{
+			return errorRoomId;
+		}
+
+		//	...
+		return null;
+	}
+}
