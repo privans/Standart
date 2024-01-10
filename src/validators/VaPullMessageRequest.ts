@@ -5,4 +5,12 @@ import _ from "lodash";
 /**
  * 	@class
  */
-export cla
+export class VaPullMessageRequest
+{
+	/**
+	 *	@param pullRequest	{PullMessageRequest}
+	 *	@returns {string | null}
+	 */
+	static validatePullMessageRequest( pullRequest : PullMessageRequest ) : string | null
+	{
+		if
