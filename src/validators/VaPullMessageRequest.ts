@@ -19,4 +19,15 @@ export class VaPullMessageRequest
 		}
 
 		const errorRoomId : string | null = VaChatRoomEntityItem.isValidRoomId( pullRequest.roomId );
-		if ( null !=
+		if ( null !== errorRoomId )
+		{
+			return errorRoomId;
+		}
+
+		if ( ! _.isNumber( pullRequest.startTimestamp ) )
+		{
+			return `invalid .startTimestamp`;
+		}
+		if ( pullRequest.startTimestamp < -1 )
+		{
+			return `inva
