@@ -30,4 +30,13 @@ export class VaPullMessageRequest
 		}
 		if ( pullRequest.startTimestamp < -1 )
 		{
-			return `inva
+			return `invalid .startTimestamp, too young`;
+		}
+
+		if ( ! _.isNumber( pullRequest.endTimestamp ) )
+		{
+			return `invalid .endTimestamp`;
+		}
+		if ( pullRequest.endTimestamp < -1 )
+		{
+			return 
