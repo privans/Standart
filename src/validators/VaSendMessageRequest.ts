@@ -130,3 +130,4 @@ export class VaSendMessageRequest
 
 		return null;
 	}
+}
