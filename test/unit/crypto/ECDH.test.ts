@@ -25,4 +25,8 @@ describe( "ECDH", () =>
 
 			expect( isHexString( alicePrivateKey, 32 ) ).toBeTruthy();
 			expect( isHexString( alicePublicKey, 33 ) ).toBeTruthy();
-			expect( isHexString( bobPr
+			expect( isHexString( bobPrivateKey, 32 ) ).toBeTruthy();
+			expect( isHexString( bobPublicKey, 33 ) ).toBeTruthy();
+
+			const aliceKey = new ethers.SigningKey( alicePrivateKey );
+			const bobKey = new ethers
