@@ -21,4 +21,8 @@ describe( "ECDH", () =>
 			const alicePublicKey = `0x0388447f78493804b3d885988d6a81b5e1a2b6c9496d314ae7e6c5efd376c7adea`;
 
 			const bobPrivateKey = `0xf8ba731e3d09ce93ee6256d7393e993be01cd84de044798372c0d1a8ad9b952a`;
-			const bobPub
+			const bobPublicKey = `0x03ed2098910ab9068abd54e1562eb9dee3cb2d9fc1426dfe91541970a89b5aa622`;
+
+			expect( isHexString( alicePrivateKey, 32 ) ).toBeTruthy();
+			expect( isHexString( alicePublicKey, 33 ) ).toBeTruthy();
+			expect( isHexString( bobPr
