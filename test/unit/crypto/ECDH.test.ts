@@ -29,4 +29,9 @@ describe( "ECDH", () =>
 			expect( isHexString( bobPublicKey, 33 ) ).toBeTruthy();
 
 			const aliceKey = new ethers.SigningKey( alicePrivateKey );
-			const bobKey = new ethers
+			const bobKey = new ethers.SigningKey( bobPrivateKey );
+
+			const aliceSharedSecret = aliceKey.computeSharedSecret( bobPublicKey );
+			const bobSharedSecret = bobKey.computeSharedSecret( alicePublicKey );
+
+			// console.log( `ethers
