@@ -34,4 +34,8 @@ describe( "ECDH", () =>
 			const aliceSharedSecret = aliceKey.computeSharedSecret( bobPublicKey );
 			const bobSharedSecret = bobKey.computeSharedSecret( alicePublicKey );
 
-			// console.log( `ethers
+			// console.log( `ethers :: aliceSharedSecret :`, aliceSharedSecret );
+			// console.log( `ethers :: bobSharedSecret :`, bobSharedSecret );
+			expect( aliceSharedSecret ).toBeDefined();
+			expect( bobSharedSecret ).toBeDefined();
+			expect( 'string' === typeof
