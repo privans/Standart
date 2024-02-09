@@ -38,4 +38,7 @@ describe( "ECDH", () =>
 			// console.log( `ethers :: bobSharedSecret :`, bobSharedSecret );
 			expect( aliceSharedSecret ).toBeDefined();
 			expect( bobSharedSecret ).toBeDefined();
-			expect( 'string' === typeof
+			expect( 'string' === typeof aliceSharedSecret ).toBeTruthy();
+			expect( 'string' === typeof bobSharedSecret ).toBeTruthy();
+			expect( aliceSharedSecret.length ).toBeGreaterThanOrEqual( 0 );
+			expect( bobSharedSecret.length ).toBe
