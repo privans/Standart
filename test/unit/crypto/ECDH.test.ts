@@ -41,4 +41,8 @@ describe( "ECDH", () =>
 			expect( 'string' === typeof aliceSharedSecret ).toBeTruthy();
 			expect( 'string' === typeof bobSharedSecret ).toBeTruthy();
 			expect( aliceSharedSecret.length ).toBeGreaterThanOrEqual( 0 );
-			expect( bobSharedSecret.length ).toBe
+			expect( bobSharedSecret.length ).toBeGreaterThanOrEqual( 0 );
+			expect( aliceSharedSecret ).toBe( bobSharedSecret );
+		});
+	} );
+} );
