@@ -299,3 +299,208 @@ describe( "ClientRoom", () =>
 				chatType : ChatType.GROUP,
 				name : 'Group A',
 				roomId : randomRoomId,
+				desc : 'Group A',
+				members : {
+					[ BobWalletObj.address ] : {
+						memberType : ChatRoomMemberType.OWNER,
+						wallet : BobWalletObj.address,
+						publicKey : undefined,
+						userName : 'Bob',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					},
+					[ AliceWalletObj.address ] : {
+						memberType : ChatRoomMemberType.MEMBER,
+						wallet : AliceWalletObj.address,
+						publicKey : undefined,
+						userName : 'Alice',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					}
+				},
+			};
+			const chatRoomEntityItem : ChatRoomEntityItem = await clientRoom.createRoom( createChatRoom );
+			expect( chatRoomEntityItem ).not.toBeNull();
+			expect( chatRoomEntityItem ).toHaveProperty( 'chatType' );
+			expect( chatRoomEntityItem ).toHaveProperty( 'roomId' );
+			expect( chatRoomEntityItem ).toHaveProperty( 'desc' );
+			expect( chatRoomEntityItem ).toHaveProperty( 'password' );
+			expect( chatRoomEntityItem ).toHaveProperty( 'timestamp' );
+			expect( chatRoomEntityItem ).toHaveProperty( 'members' );
+			expect( chatRoomEntityItem?.chatType ).toBe( ChatType.GROUP );
+			expect( chatRoomEntityItem?.roomId ).toBe( createChatRoom.roomId );
+			expect( chatRoomEntityItem?.desc ).toBe( createChatRoom.desc );
+			expect( chatRoomEntityItem?.members ).toHaveProperty( BobWalletObj.address );
+			expect( chatRoomEntityItem?.members ).toHaveProperty( AliceWalletObj.address );
+
+			const members : ChatRoomMembers = await clientRoom.queryMembers( BobWalletObj.address, randomRoomId );
+			expect( _.isObject( members ) ).toBeTruthy();
+			expect( Object.keys( members ).length ).toBe( 2 );
+		});
+
+		it( "should create a GROUP Chat invitation and then accept it", async () =>
+		{
+			//
+			//	will create a new chat room
+			//
+			const createChatRoom : CreateChatRoom = {
+				wallet : BobWalletObj.address,
+				chatType : ChatType.GROUP,
+				name : 'Group A',
+				desc : 'Group A',
+				members : {
+					[ BobWalletObj.address ] : {
+						memberType : ChatRoomMemberType.OWNER,
+						wallet : BobWalletObj.address,
+						publicKey : undefined,
+						userName : 'Bob',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					},
+					[ AliceWalletObj.address ] : {
+						memberType : ChatRoomMemberType.MEMBER,
+						wallet : AliceWalletObj.address,
+						publicKey : undefined,
+						userName : 'Alice',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					}
+				},
+			};
+			const createdChatRoom : ChatRoomEntityItem = await clientRoom.createRoom( createChatRoom );
+			expect( createdChatRoom ).not.toBeNull();
+
+			//
+			//	create invitation
+			//
+			const inviteRequest : InviteRequest | null = await clientRoom.inviteMember( BobWalletObj.address, createdChatRoom.roomId );
+			expect( inviteRequest ).not.toBeNull();
+			expect( _.isObject( inviteRequest ) ).toBeTruthy();
+
+			//
+			//	accept and save it into database
+			//
+			const inviteString = JSON.stringify( inviteRequest );
+			const member : ChatRoomMember = {
+				memberType : ChatRoomMemberType.MEMBER,
+				wallet : AliceWalletObj.address,
+				publicKey : AliceWalletObj.publicKey,
+				userName : 'Alice',
+				userAvatar : 'https://wwa.com/adf.act.jpg',
+				timestamp : new Date().getTime()
+			};
+			const chatRoomEntityItem : ChatRoomEntityItem = await clientRoom.acceptInvitation( inviteString, member );
+			expect( chatRoomEntityItem ).not.toBeNull();
+			expect( _.isObject( chatRoomEntityItem ) ).toBeTruthy();
+
+			//
+			//	query members, it should contain only the room owner
+			//
+			const members : ChatRoomMembers = await clientRoom.queryMembers( BobWalletObj.address, createdChatRoom.roomId );
+			expect( _.isObject( members ) ).toBeTruthy();
+			expect( Object.keys( members ).length ).toBe( 2 );
+		});
+		it( "should throw error of `unable to add yourself` while trying to accept GROUP Chat invitation", async () =>
+		{
+			//
+			//	will create a new chat room
+			//
+			const createChatRoom : CreateChatRoom = {
+				wallet : BobWalletObj.address,
+				chatType : ChatType.GROUP,
+				name : 'Group A',
+				desc : 'Group A',
+				members : {
+					[ BobWalletObj.address ] : {
+						memberType : ChatRoomMemberType.OWNER,
+						wallet : BobWalletObj.address,
+						publicKey : undefined,
+						userName : 'Bob',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					},
+					[ AliceWalletObj.address ] : {
+						memberType : ChatRoomMemberType.MEMBER,
+						wallet : AliceWalletObj.address,
+						publicKey : undefined,
+						userName : 'Alice',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					}
+				},
+			};
+			const createdChatRoom : ChatRoomEntityItem = await clientRoom.createRoom( createChatRoom );
+			expect( createdChatRoom ).not.toBeNull();
+
+			//
+			//	create invitation
+			//
+			const inviteRequest : InviteRequest | null = await clientRoom.inviteMember( BobWalletObj.address, createdChatRoom.roomId );
+			expect( inviteRequest ).not.toBeNull();
+			expect( _.isObject( inviteRequest ) ).toBeTruthy();
+
+			//
+			//	accept and save it into the database
+			//
+			const inviteString = JSON.stringify( inviteRequest );
+			const member : ChatRoomMember = {
+				memberType : ChatRoomMemberType.MEMBER,
+				wallet : BobWalletObj.address,
+				publicKey : undefined,
+				userName : 'Bob',
+				userAvatar : 'https://www.aaa/avatar.png',
+				timestamp : new Date().getTime()
+			};
+			try
+			{
+				await clientRoom.acceptInvitation( inviteString, member );
+			}
+			catch ( err )
+			{
+				expect( err ).toContain( `unable to add yourself` );
+			}
+		});
+
+
+		it( "should create an PRIVATE Chat invitation and then accept it", async () =>
+		{
+			//
+			//	will create a new chat room
+			//
+			const createChatRoom : CreateChatRoom = {
+				wallet : BobWalletObj.address,
+				chatType : ChatType.PRIVATE,
+				name : 'Group A',
+				desc : 'Group A',
+				members : {
+					[ BobWalletObj.address ] : {
+						memberType : ChatRoomMemberType.OWNER,
+						wallet : BobWalletObj.address,
+						publicKey : BobWalletObj.publicKey,
+						userName : 'Bob',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					}
+				},
+			};
+			const createdChatRoom : ChatRoomEntityItem = await clientRoom.createRoom( createChatRoom );
+			expect( createdChatRoom ).not.toBeNull();
+
+			//
+			//	create invitation
+			//
+			const inviteRequest : InviteRequest | null = await clientRoom.inviteMember( BobWalletObj.address, createdChatRoom.roomId );
+			expect( inviteRequest ).not.toBeNull();
+			expect( _.isObject( inviteRequest ) ).toBeTruthy();
+
+			//
+			//	accept and save it into database
+			//
+			const inviteString = JSON.stringify( inviteRequest );
+			const member : ChatRoomMember = {
+				memberType : ChatRoomMemberType.MEMBER,
+				wallet : AliceWalletObj.address,
+				publicKey : AliceWalletObj.publicKey,
+				userName : 'Alice',
+				userAvatar : 'https://wwa.com/adf.act.jpg',
+				timestamp : new Date().getTime()
