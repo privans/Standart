@@ -504,3 +504,224 @@ describe( "ClientRoom", () =>
 				userName : 'Alice',
 				userAvatar : 'https://wwa.com/adf.act.jpg',
 				timestamp : new Date().getTime()
+			};
+			const chatRoomEntityItem : ChatRoomEntityItem = await clientRoom.acceptInvitation( inviteString, member );
+			expect( chatRoomEntityItem ).not.toBeNull();
+			expect( _.isObject( chatRoomEntityItem ) ).toBeTruthy();
+
+			//
+			//	query members, it should contain only the room owner
+			//
+			const members : ChatRoomMembers = await clientRoom.queryMembers( AliceWalletObj.address, createdChatRoom.roomId );
+			expect( _.isObject( members ) ).toBeTruthy();
+			expect( Object.keys( members ).length ).toBe( 2 );
+		});
+		// it( "should throw exception `number of members reached the upper limit for creating invitation`", async () =>
+		// {
+		// 	//
+		// 	//	will create a new chat room
+		// 	//
+		// 	const createChatRoom : CreateChatRoom = {
+		// 		wallet : BobWalletObj.address,
+		// 		chatType : ChatType.PRIVATE,
+		// 		name : 'Group A',
+		// 		desc : 'Group A',
+		// 		members : {
+		// 			[ BobWalletObj.address ] : {
+		// 				memberType : ChatRoomMemberType.OWNER,
+		// 				wallet : BobWalletObj.address,
+		// 				publicKey : BobWalletObj.publicKey,
+		// 				userName : 'Bob',
+		// 				userAvatar : 'https://www.aaa/avatar.png',
+		// 				timestamp : new Date().getTime()
+		// 			},
+		// 			[ AliceWalletObj.address ] : {
+		// 				memberType : ChatRoomMemberType.MEMBER,
+		// 				wallet : AliceWalletObj.address,
+		// 				publicKey : undefined,
+		// 				userName : 'Alice',
+		// 				userAvatar : 'https://www.aaa/avatar.png',
+		// 				timestamp : new Date().getTime()
+		// 			}
+		// 		},
+		// 	};
+		// 	const createdChatRoom : ChatRoomEntityItem = await clientRoom.createRoom( createChatRoom );
+		// 	expect( createdChatRoom ).not.toBeNull();
+		//
+		// 	//
+		// 	//	create invitation
+		// 	//
+		// 	try
+		// 	{
+		// 		await clientRoom.inviteMember( BobWalletObj.address, createdChatRoom.roomId );
+		// 	}
+		// 	catch ( err )
+		// 	{
+		// 		expect( err ).toContain( `number of members reached the upper limit for creating invitation` );
+		// 	}
+		// });
+
+		it( "should throw error of `unable to add yourself` while trying to accept PRIVATE Chat invitation", async () =>
+		{
+			//
+			//	will create a new chat room
+			//
+			const createChatRoom : CreateChatRoom = {
+				wallet : BobWalletObj.address,
+				chatType : ChatType.PRIVATE,
+				name : 'Group A',
+				desc : 'Group A',
+				members : {
+					[ BobWalletObj.address ] : {
+						memberType : ChatRoomMemberType.OWNER,
+						wallet : BobWalletObj.address,
+						publicKey : BobWalletObj.publicKey,
+						userName : 'Bob',
+						userAvatar : 'https://www.aaa/avatar.png',
+						timestamp : new Date().getTime()
+					},
+					// [ AliceWalletObj.address ] : {
+					// 	memberType : ChatRoomMemberType.MEMBER,
+					// 	wallet : AliceWalletObj.address,
+					// 	publicKey : AliceWalletObj.publicKey,
+					// 	userName : 'Alice',
+					// 	userAvatar : 'https://www.aaa/avatar.png',
+					// 	timestamp : new Date().getTime()
+					// }
+				},
+			};
+			const createdChatRoom : ChatRoomEntityItem = await clientRoom.createRoom( createChatRoom );
+			expect( createdChatRoom ).not.toBeNull();
+
+			//
+			//	create invitation
+			//
+			const inviteRequest : InviteRequest | null = await clientRoom.inviteMember( BobWalletObj.address, createdChatRoom.roomId );
+			expect( inviteRequest ).not.toBeNull();
+			expect( _.isObject( inviteRequest ) ).toBeTruthy();
+
+			//
+			//	accept and save it into the database
+			//
+			const inviteString = JSON.stringify( inviteRequest );
+			const member : ChatRoomMember = {
+				memberType : ChatRoomMemberType.MEMBER,
+				wallet : BobWalletObj.address,
+				publicKey : BobWalletObj.publicKey,
+				userName : 'Bob',
+				userAvatar : 'https://www.aaa/avatar.png',
+				timestamp : new Date().getTime()
+			};
+			try
+			{
+				await clientRoom.acceptInvitation( inviteString, member );
+			}
+			catch ( err )
+			{
+				expect( err ).toContain( `unable to add yourself` );
+			}
+		});
+
+
+
+
+		const MaryWalletObj = EtherWallet.createWalletFromMnemonic();
+		const MaryWalletAddress = MaryWalletObj.address.trim().toLowerCase();
+		const MaryMember : ChatRoomMember = {
+			memberType : ChatRoomMemberType.MEMBER,
+			wallet : MaryWalletAddress,
+			publicKey : undefined,
+			userName : 'Mary',
+			userAvatar : 'https://www.aaa/avatar.png',
+			timestamp : new Date().getTime()
+		};
+		it( "should put an member named Mary", async () =>
+		{
+			const saved : boolean = await clientRoom.putMember( BobWalletObj.address, randomRoomId, MaryMember );
+			expect( saved ).toBeTruthy();
+		});
+
+		it( "should return all members of a Group Chat Room", async () =>
+		{
+			//	get all members
+			const members : ChatRoomMembers = await clientRoom.queryMembers( BobWalletObj.address, randomRoomId );
+			expect( members ).toBeDefined();
+			expect( _.isObject( members ) && ! _.isEmpty( members ) ).toBeTruthy();
+			expect( Object.keys( members ).length ).toBe( 3 );
+			expect( members ).toHaveProperty( MaryWalletAddress );
+			expect( members ).toHaveProperty( BobWalletObj.address.trim().toLowerCase() );
+			expect( members ).toHaveProperty( AliceWalletObj.address.trim().toLowerCase() );
+			if ( members )
+			{
+				const member = members[ MaryWalletAddress ];
+				expect( member ).toBeDefined();
+				expect( member ).toHaveProperty( 'memberType' );
+				expect( member ).toHaveProperty( 'wallet' );
+				expect( member ).toHaveProperty( 'userName' );
+				expect( member ).toHaveProperty( 'userAvatar' );
+				expect( member ).toHaveProperty( 'timestamp' );
+				expect( member.memberType ).toBe( MaryMember.memberType );
+				expect( member.wallet ).toBe( MaryMember.wallet );
+				expect( member.publicKey ).toBe( MaryMember.publicKey );
+				expect( member.userName ).toBe( MaryMember.userName );
+				expect( member.userAvatar ).toBe( MaryMember.userAvatar );
+				expect( member.timestamp ).toBe( MaryMember.timestamp );
+			}
+		});
+		it( "should return a member of a Group Chat Room", async () =>
+		{
+			const member : ChatRoomMember | null = await clientRoom.getMember( BobWalletObj.address, randomRoomId, MaryWalletAddress );
+			expect( member ).toBeDefined();
+			expect( _.isObject( member ) && ! _.isEmpty( member ) ).toBeTruthy();
+			if ( member )
+			{
+				expect( member ).toBeDefined();
+				expect( member ).toHaveProperty( 'memberType' );
+				expect( member ).toHaveProperty( 'wallet' );
+				expect( member ).toHaveProperty( 'userName' );
+				expect( member ).toHaveProperty( 'userAvatar' );
+				expect( member ).toHaveProperty( 'timestamp' );
+				expect( member.memberType ).toBe( MaryMember.memberType );
+				expect( member.wallet ).toBe( MaryMember.wallet );
+				expect( member.publicKey ).toBe( MaryMember.publicKey );
+				expect( member.userName ).toBe( MaryMember.userName );
+				expect( member.userAvatar ).toBe( MaryMember.userAvatar );
+				expect( member.timestamp ).toBe( MaryMember.timestamp );
+			}
+		});
+
+		it( "should delete a member from a Group Chat Room", async () =>
+		{
+			const deleted : boolean = await clientRoom.deleteMember( BobWalletObj.address, randomRoomId, MaryWalletAddress );
+			expect( deleted ).toBeTruthy();
+
+			const member : ChatRoomMember | null = await clientRoom.getMember( BobWalletObj.address, randomRoomId, MaryWalletAddress );
+			expect( member ).toBeNull();
+		});
+
+		it( "should delete the object just saved", async () =>
+		{
+			const key : string | null = clientRoom.chatRoomStorageService.getKeyByWalletAndRoomId( BobWalletObj.address, randomRoomId );
+			expect( key ).not.toBeNull();
+			expect( clientRoom.chatRoomStorageService.isValidKey( key ) ).toBeTruthy();
+			if ( key )
+			{
+				const deleted : boolean = await clientRoom.chatRoomStorageService.delete( key );
+				expect( deleted ).toBeTruthy();
+			}
+		});
+
+
+
+		it( "should return all rooms", async () =>
+		{
+			const rooms : Array<ChatRoomEntityItem> = await clientRoom.queryRooms();
+			expect( Array.isArray( rooms ) ).toBeTruthy();
+			expect( rooms.length ).toBeGreaterThanOrEqual( 0 );
+			for ( const room of rooms )
+			{
+				//console.log( `room :`, room );
+				expect( room ).not.toBeNull();
+				expect( room ).toHaveProperty( 'chatType' );
+				expect( room ).toHaveProperty( 'roomId' );
+				expect( room ).toHaveProperty( 'desc' );
