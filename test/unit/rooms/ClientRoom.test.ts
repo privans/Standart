@@ -725,3 +725,51 @@ describe( "ClientRoom", () =>
 				expect( room ).toHaveProperty( 'chatType' );
 				expect( room ).toHaveProperty( 'roomId' );
 				expect( room ).toHaveProperty( 'desc' );
+				expect( room ).toHaveProperty( 'password' );
+				expect( room ).toHaveProperty( 'timestamp' );
+				expect( room ).toHaveProperty( 'members' );
+				expect( room.chatType in ChatType ).toBeTruthy();
+				expect( _.isObject( room.members ) ).toBeTruthy();
+				expect( Array.isArray( Object.keys( room.members ) ) ).toBeTruthy();
+				expect( Object.keys( room.members ).length ).toBeGreaterThanOrEqual( 0 );
+				for ( const memberKey in room.members )
+				{
+					expect( _.isString( memberKey ) ).toBeTruthy();
+					const member = room.members[ memberKey ];
+					expect( member ).toBeDefined();
+					expect( member ).toHaveProperty( 'memberType' );
+					expect( member ).toHaveProperty( 'wallet' );
+					expect( member ).toHaveProperty( 'userName' );
+					expect( member ).toHaveProperty( 'userAvatar' );
+					expect( member ).toHaveProperty( 'timestamp' );
+					expect( member.memberType in ChatRoomMemberType ).toBeTruthy();
+					expect( EtherWallet.isValidAddress( member.wallet ) ).toBeTruthy();
+				}
+			}
+		});
+
+		it( "should query rooms one by on", async () =>
+		{
+			const rooms : Array<ChatRoomEntityItem> = await clientRoom.queryRooms();
+			expect( Array.isArray( rooms ) ).toBeTruthy();
+			expect( rooms.length ).toBeGreaterThanOrEqual( 0 );
+			for ( const room of rooms )
+			{
+				//console.log( `room :`, room );
+				expect( room ).not.toBeNull();
+				expect( room ).toHaveProperty( 'chatType' );
+				expect( room ).toHaveProperty( 'roomId' );
+
+				const roomItem : ChatRoomEntityItem | null = await clientRoom.queryRoom( BobWalletObj.address, room.roomId );
+				expect( roomItem ).not.toBeNull();
+				expect( roomItem ).not.toBeNull();
+				expect( roomItem ).toHaveProperty( 'chatType' );
+				expect( roomItem ).toHaveProperty( 'roomId' );
+				expect( roomItem ).toHaveProperty( 'desc' );
+				expect( roomItem ).toHaveProperty( 'password' );
+				expect( roomItem ).toHaveProperty( 'timestamp' );
+				expect( roomItem ).toHaveProperty( 'members' );
+			}
+		});
+	} );
+} );
