@@ -139,3 +139,10 @@ describe( "ClientRoomExtensions", () =>
 			expect( valueOfKey3 && _.isObject( valueOfKey3[ `payload` ] ) ).toBeTruthy();
 			expect( valueOfKey3 && _.has( valueOfKey3[ `payload` ], `body` ) ).toBeTruthy();
 			expect( valueOfKey3 && _.has( valueOfKey3[ `payload` ], `count` ) ).toBeTruthy();
+
+			//	read the deleted value in key2
+			const valueOfKey2 : any = await clientRoomExtensions.queryExtension( wallet, randomRoomId, `key2` );
+			expect( valueOfKey2 ).toBe( undefined );
+		});
+	} );
+} );
