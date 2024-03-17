@@ -10,4 +10,15 @@ import { RoomUtil } from "../../../src";
 /**
  *	unit test
  */
-d
+describe( "ChatHistoryStorageService", () =>
+{
+	beforeAll( async () =>
+	{
+	});
+	afterAll( async () =>
+	{
+	});
+
+	describe( "Test saving Private Chat Room", () =>
+	{
+		const chatHistor
