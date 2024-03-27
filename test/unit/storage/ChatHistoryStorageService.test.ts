@@ -21,4 +21,11 @@ describe( "ChatHistoryStorageService", () =>
 
 	describe( "Test saving Private Chat Room", () =>
 	{
-		const chatHistor
+		const chatHistoryStorageService = new ChatHistoryStorageService();
+		let randomRoomId = RoomUtil.generateRandomRoomId( ChatType.GROUP );
+
+		it( "should put some histories", async () =>
+		{
+			for ( let i = 0; i < 100; i ++ )
+			{
+			
