@@ -28,4 +28,9 @@ describe( "ChatHistoryStorageService", () =>
 		{
 			for ( let i = 0; i < 100; i ++ )
 			{
-			
+				const history : ChatHistoryEntityItem = {
+					uuid: UUIDv4().toString(),
+					roomId : randomRoomId,
+					userName : `User-${ i }`,
+					userAvatar : `https://www.a.com/${ i }.png`,
+					body : `it's t
