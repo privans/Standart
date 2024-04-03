@@ -33,4 +33,11 @@ describe( "ChatHistoryStorageService", () =>
 					roomId : randomRoomId,
 					userName : `User-${ i }`,
 					userAvatar : `https://www.a.com/${ i }.png`,
-					body : `it's t
+					body : `it's the body`,
+					timestamp : new Date().getTime()
+				};
+				const key : string | null = chatHistoryStorageService.getKeyByItem( history );
+				expect( key ).not.toBeNull();
+				if ( key )
+				{
+					const s
