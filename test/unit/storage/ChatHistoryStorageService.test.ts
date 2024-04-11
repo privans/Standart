@@ -40,4 +40,12 @@ describe( "ChatHistoryStorageService", () =>
 				expect( key ).not.toBeNull();
 				if ( key )
 				{
-					const s
+					const saved = await chatHistoryStorageService.put( key, history );
+					expect( saved ).toBeTruthy();
+				}
+			}
+		});
+
+		it( "should query histories", async () =>
+		{
+			const historyList : Arra
