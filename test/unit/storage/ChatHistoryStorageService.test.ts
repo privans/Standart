@@ -48,4 +48,6 @@ describe( "ChatHistoryStorageService", () =>
 
 		it( "should query histories", async () =>
 		{
-			const historyList : Arra
+			const historyList : Array<ChatHistoryEntityItem | null> | null = await chatHistoryStorageService.query( ( _key : string, item : any, _index : number ) : boolean =>
+			{
+				return item.userName === `User-0`;
