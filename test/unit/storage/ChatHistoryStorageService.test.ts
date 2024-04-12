@@ -51,3 +51,10 @@ describe( "ChatHistoryStorageService", () =>
 			const historyList : Array<ChatHistoryEntityItem | null> | null = await chatHistoryStorageService.query( ( _key : string, item : any, _index : number ) : boolean =>
 			{
 				return item.userName === `User-0`;
+			});
+			//console.log( `list :`, historyList );
+			//	should output:
+			//	list : [
+			//       {
+			//         roomId: 'g0x9dac6a85f48d2967480622eed576e941573c874e',
+			//         userName: 'User-0
