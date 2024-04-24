@@ -57,4 +57,11 @@ describe( "ChatHistoryStorageService", () =>
 			//	list : [
 			//       {
 			//         roomId: 'g0x9dac6a85f48d2967480622eed576e941573c874e',
-			//         userName: 'User-0
+			//         userName: 'User-0',
+			//         userAvatar: 'https://www.a.com/0.png',
+			//         body: "it's the body",
+			//         timestamp: 1699337767806
+			//       }
+			//     ]
+			expect( historyList ).not.toBeNull();
+	
