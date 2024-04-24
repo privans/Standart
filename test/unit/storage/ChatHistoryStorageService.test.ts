@@ -64,4 +64,10 @@ describe( "ChatHistoryStorageService", () =>
 			//       }
 			//     ]
 			expect( historyList ).not.toBeNull();
-	
+			expect( Array.isArray( historyList ) ).toBeTruthy();
+			if ( historyList )
+			{
+				expect( historyList.length ).toBeGreaterThanOrEqual( 1 );
+				for ( const historyItem of historyList )
+				{
+			
