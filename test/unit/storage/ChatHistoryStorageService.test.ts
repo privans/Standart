@@ -74,4 +74,9 @@ describe( "ChatHistoryStorageService", () =>
 					expect( _.isObject( historyItem ) ).toBeTruthy();
 					expect( historyItem ).toHaveProperty( 'roomId' );
 					expect( historyItem ).toHaveProperty( 'userName' );
-					expect( 
+					expect( historyItem ).toHaveProperty( 'userAvatar' );
+					expect( historyItem ).toHaveProperty( 'body' );
+					expect( historyItem ).toHaveProperty( 'timestamp' );
+					if ( historyItem )
+					{
+						expect(
