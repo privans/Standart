@@ -70,4 +70,8 @@ describe( "ChatHistoryStorageService", () =>
 				expect( historyList.length ).toBeGreaterThanOrEqual( 1 );
 				for ( const historyItem of historyList )
 				{
-			
+					expect( historyItem ).not.toBeNull();
+					expect( _.isObject( historyItem ) ).toBeTruthy();
+					expect( historyItem ).toHaveProperty( 'roomId' );
+					expect( historyItem ).toHaveProperty( 'userName' );
+					expect( 
