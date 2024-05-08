@@ -79,4 +79,14 @@ describe( "ChatHistoryStorageService", () =>
 					expect( historyItem ).toHaveProperty( 'timestamp' );
 					if ( historyItem )
 					{
-						expect(
+						expect( historyItem.userName ).toBe( `User-0` );
+					}
+				}
+			}
+		});
+
+		it( "should query histories in paginated format", async () =>
+		{
+			for ( let i = 1; i <= 10; i ++ )
+			{
+				const pageOptions : Pag
