@@ -93,4 +93,11 @@ describe( "ChatHistoryStorageService", () =>
 					pageNo : i,
 					pageSize : 10
 				}
-				const historyList : Array<ChatHistoryEntityItem | null> | null = await chatHistoryStorageService.query( ( _key : string, _item : any, _index : numb
+				const historyList : Array<ChatHistoryEntityItem | null> | null = await chatHistoryStorageService.query( ( _key : string, _item : any, _index : number ) : boolean =>
+				{
+					return true;
+				}, pageOptions );
+				//console.log( `historyList pageNo:${ i } :`, historyList );
+				//	historyList pageNo:10 : [
+				//       {
+				//         uuid: 'e42bc49f-2620-4
