@@ -100,4 +100,9 @@ describe( "ChatHistoryStorageService", () =>
 				//console.log( `historyList pageNo:${ i } :`, historyList );
 				//	historyList pageNo:10 : [
 				//       {
-				//         uuid: 'e42bc49f-2620-4
+				//         uuid: 'e42bc49f-2620-434c-9ba9-009846d81edb',
+				//         roomId: 'g0xe94dd9b1d264f516a17db9a2afdea9f4f496fd6a',
+				//         userName: 'User-4',
+				//         userAvatar: 'https://www.a.com/4.png',
+				//         body: "it's the body",
+				//     
