@@ -89,4 +89,8 @@ describe( "ChatHistoryStorageService", () =>
 		{
 			for ( let i = 1; i <= 10; i ++ )
 			{
-				const pageOptions : Pag
+				const pageOptions : PaginationOptions = {
+					pageNo : i,
+					pageSize : 10
+				}
+				const historyList : Array<ChatHistoryEntityItem | null> | null = await chatHistoryStorageService.query( ( _key : string, _item : any, _index : numb
