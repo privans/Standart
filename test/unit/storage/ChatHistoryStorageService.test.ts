@@ -154,4 +154,9 @@ describe( "ChatHistoryStorageService", () =>
 				//         userAvatar: 'https://www.a.com/67.png',
 				//         body: "it's the body",
 				//         timestamp: 1699342522848
-				// 
+				//       },
+				//       {
+				//         uuid: 'f5da4a14-27d4-49b5-b290-44b7aac05e3f',
+				//         roomId: 'g0xe94dd9b1d264f516a17db9a2afdea9f4f496fd6a',
+				//         userName: 'User-12',
+				//         user
