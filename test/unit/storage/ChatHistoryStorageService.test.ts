@@ -159,4 +159,10 @@ describe( "ChatHistoryStorageService", () =>
 				//         uuid: 'f5da4a14-27d4-49b5-b290-44b7aac05e3f',
 				//         roomId: 'g0xe94dd9b1d264f516a17db9a2afdea9f4f496fd6a',
 				//         userName: 'User-12',
-				//         user
+				//         userAvatar: 'https://www.a.com/12.png',
+				//         body: "it's the body",
+				//         timestamp: 1699342522836
+				//       },
+				//       {
+				//         uuid: 'fc249876-af2c-4514-b079-4cb88248b38e',
+				//
