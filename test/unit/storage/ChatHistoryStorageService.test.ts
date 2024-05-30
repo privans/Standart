@@ -180,4 +180,11 @@ describe( "ChatHistoryStorageService", () =>
 				//         timestamp: 1699342522838
 				//       }
 				//     ]
-				expect( historyList ).not.toBe
+				expect( historyList ).not.toBeNull();
+				expect( Array.isArray( historyList ) ).toBeTruthy();
+				if ( historyList )
+				{
+					expect( historyList.length ).toBe( 10 );
+					for ( const historyItem of historyList )
+					{
+		
