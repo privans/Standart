@@ -191,4 +191,7 @@ describe( "ChatHistoryStorageService", () =>
 						expect( _.isObject( historyItem ) );
 						expect( historyItem ).toHaveProperty( 'uuid' );
 						expect( historyItem ).toHaveProperty( 'roomId' );
-		
+						expect( historyItem ).toHaveProperty( 'userName' );
+						expect( historyItem ).toHaveProperty( 'userAvatar' );
+						expect( historyItem ).toHaveProperty( 'body' );
+						expect( historyItem ).toHavePrope
