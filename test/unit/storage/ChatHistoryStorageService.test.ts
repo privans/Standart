@@ -187,4 +187,8 @@ describe( "ChatHistoryStorageService", () =>
 					expect( historyList.length ).toBe( 10 );
 					for ( const historyItem of historyList )
 					{
+						expect( historyItem ).not.toBeNull();
+						expect( _.isObject( historyItem ) );
+						expect( historyItem ).toHaveProperty( 'uuid' );
+						expect( historyItem ).toHaveProperty( 'roomId' );
 		
