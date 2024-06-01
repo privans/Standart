@@ -319,3 +319,117 @@ describe( "ChatRoomStorageService", () =>
 						expect( value.members ).toHaveProperty( BobWalletObj.address );
 						expect( value.members ).toHaveProperty( AliceWalletObj.address );
 					}
+				}
+			}
+		});
+
+		const MaryWalletObj = EtherWallet.createWalletFromMnemonic();
+		const MaryWalletAddress = MaryWalletObj.address.trim().toLowerCase();
+		const MaryMember : ChatRoomMember = {
+			memberType : ChatRoomMemberType.MEMBER,
+			wallet : MaryWalletAddress,
+			publicKey : undefined,
+			userName : 'Mary',
+			userAvatar : 'https://www.aaa/avatar.png',
+			timestamp : new Date().getTime()
+		};
+
+		it( "should put a new member to Group Chat Room", async () =>
+		{
+			const key : string | null = chatRoomStorageService.getKeyByWalletAndRoomId( BobWalletObj.address, randomRoomId );
+			expect( key ).not.toBeNull();
+			expect( chatRoomStorageService.isValidKey( key ) ).toBeTruthy();
+			if ( key )
+			{
+				const saved : boolean = await chatRoomStorageService.putMember( key, MaryMember );
+				expect( saved ).toBeTruthy();
+			}
+		});
+		it( "should return all members of a Group Chat Room", async () =>
+		{
+			const key : string | null = chatRoomStorageService.getKeyByWalletAndRoomId( BobWalletObj.address, randomRoomId );
+			expect( key ).not.toBeNull();
+			expect( chatRoomStorageService.isValidKey( key ) ).toBeTruthy();
+			if ( key )
+			{
+				//	get all members
+				const members : ChatRoomMembers | null = await chatRoomStorageService.getMembers( key );
+				expect( members ).toBeDefined();
+				expect( _.isObject( members ) && ! _.isEmpty( members ) ).toBeTruthy();
+				expect( members ).toHaveProperty( MaryWalletAddress );
+				if ( members )
+				{
+					const member = members[ MaryWalletAddress ];
+					expect( member ).toBeDefined();
+					expect( member ).toHaveProperty( 'memberType' );
+					expect( member ).toHaveProperty( 'wallet' );
+					expect( member ).toHaveProperty( 'userName' );
+					expect( member ).toHaveProperty( 'userAvatar' );
+					expect( member ).toHaveProperty( 'timestamp' );
+					expect( member.memberType ).toBe( MaryMember.memberType );
+					expect( member.wallet ).toBe( MaryMember.wallet );
+					expect( member.publicKey ).toBe( MaryMember.publicKey );
+					expect( member.userName ).toBe( MaryMember.userName );
+					expect( member.userAvatar ).toBe( MaryMember.userAvatar );
+					expect( member.timestamp ).toBe( MaryMember.timestamp );
+				}
+			}
+		});
+		it( "should return a member of a Group Chat Room", async () =>
+		{
+			const key : string | null = chatRoomStorageService.getKeyByWalletAndRoomId( BobWalletObj.address, randomRoomId );
+			expect( key ).not.toBeNull();
+			expect( chatRoomStorageService.isValidKey( key ) ).toBeTruthy();
+			if ( key )
+			{
+				//	get a member
+				const member : ChatRoomMember | null = await chatRoomStorageService.getMember( key, MaryWalletAddress );
+				expect( member ).toBeDefined();
+				expect( _.isObject( member ) && ! _.isEmpty( member ) ).toBeTruthy();
+				if ( member )
+				{
+					expect( member ).toBeDefined();
+					expect( member ).toHaveProperty( 'memberType' );
+					expect( member ).toHaveProperty( 'wallet' );
+					expect( member ).toHaveProperty( 'userName' );
+					expect( member ).toHaveProperty( 'userAvatar' );
+					expect( member ).toHaveProperty( 'timestamp' );
+					expect( member.memberType ).toBe( MaryMember.memberType );
+					expect( member.wallet ).toBe( MaryMember.wallet );
+					expect( member.publicKey ).toBe( MaryMember.publicKey );
+					expect( member.userName ).toBe( MaryMember.userName );
+					expect( member.userAvatar ).toBe( MaryMember.userAvatar );
+					expect( member.timestamp ).toBe( MaryMember.timestamp );
+				}
+			}
+		});
+
+		it( "should delete a member from a Group Chat Room", async () =>
+		{
+			//	get all members
+			const key : string | null = chatRoomStorageService.getKeyByWalletAndRoomId( BobWalletObj.address, randomRoomId );
+			expect( key ).not.toBeNull();
+			expect( chatRoomStorageService.isValidKey( key ) ).toBeTruthy();
+			if ( key )
+			{
+				const deleted : boolean = await chatRoomStorageService.deleteMember( key, MaryWalletAddress );
+				expect( deleted ).toBeTruthy();
+
+				const member : ChatRoomMember | null = await chatRoomStorageService.getMember( key, MaryWalletAddress );
+				expect( member ).toBeNull();
+			}
+		});
+
+		it( "should delete the object just saved", async () =>
+		{
+			const key : string | null = chatRoomStorageService.getKeyByWalletAndRoomId( BobWalletObj.address, randomRoomId );
+			expect( key ).not.toBeNull();
+			expect( chatRoomStorageService.isValidKey( key ) ).toBeTruthy();
+			if ( key )
+			{
+				const deleted : boolean = await chatRoomStorageService.delete( key );
+				expect( deleted ).toBeTruthy();
+			}
+		});
+	} );
+} );
