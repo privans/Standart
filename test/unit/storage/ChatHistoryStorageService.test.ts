@@ -194,4 +194,11 @@ describe( "ChatHistoryStorageService", () =>
 						expect( historyItem ).toHaveProperty( 'userName' );
 						expect( historyItem ).toHaveProperty( 'userAvatar' );
 						expect( historyItem ).toHaveProperty( 'body' );
-						expect( historyItem ).toHavePrope
+						expect( historyItem ).toHaveProperty( 'timestamp' );
+					}
+				}
+			}
+
+		});
+	} );
+} );
