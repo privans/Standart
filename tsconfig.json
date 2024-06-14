@@ -25,4 +25,8 @@
 		// "useDefineForClassFields": true,                  /* Emit ECMAScript-standard-compliant class fields. */
 		// "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
 
-		/* Modules *
+		/* Modules */
+		"module": "commonjs",
+		/* Specify what module code is generated. */
+		// "rootDir": "./",                                  /* Specify the root folder within your source files. */
+		// "moduleResolution": "node10",       
