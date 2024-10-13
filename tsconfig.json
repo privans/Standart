@@ -114,4 +114,21 @@
 		/* Skip type checking all .d.ts files. */
 	},
 	"include": [
-		"src/*
+		"src/**/*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"coverage",
+		"backup",
+		"tests"
+	],
+	"paths": {
+		"crypto": [
+			"node_modules/crypto-browserify"
+		],
+		"stream": [
+			"node_modules/stream-browserify"
+		]
+	}
+}
